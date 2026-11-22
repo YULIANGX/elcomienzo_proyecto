@@ -1,0 +1,5 @@
+EL COMIENZO 2.0
+58 imágenes locales con tratamiento uniforme. 61 pares GLB/USDZ con texturas procedurales.
+Los modelos conservan su geometría original; no son escaneos ni tienen realismo fotográfico garantizado.
+Copiar assets, models y script.js sobre una copia del proyecto. No borrar .git.
+Verificar visor y AR en dispositivos reales antes de publicar.

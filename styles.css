@@ -385,3 +385,69 @@
 .restore-check{color:#8fb49a;border:1px solid currentColor;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;flex-shrink:0;}
 #restore-panel.is-running .undo-progress{animation:undo-countdown 3s linear forwards;}
 #restore-panel.is-leaving{animation:undo-exit .18s ease both;}
+
+/* 2.9 — editorial dish experience */
+#dish-dialog{width:min(1120px,calc(100% - 48px));max-height:90vh;max-height:90dvh;border-radius:26px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--gold) var(--panel);box-shadow:0 28px 100px #0009;isolation:isolate}
+#dish-dialog[open]{animation:detail-rise .38s cubic-bezier(.2,.8,.2,1) both}
+#dish-dialog.is-closing[open]{animation:detail-fall .18s ease-in both}
+@keyframes detail-rise{from{opacity:0;transform:translateY(64px)}to{opacity:1;transform:translateY(0)}}
+@keyframes detail-fall{to{opacity:0;transform:translateY(42px)}}
+.detail-toolbar{position:sticky;top:0;height:0;z-index:8;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:0 16px;pointer-events:none}
+.detail-toolbar>*{pointer-events:auto;margin-top:14px!important}
+#dish-dialog .detail-round{flex:0 0 46px;width:46px;height:46px;min-height:46px;display:grid;place-items:center;border:1px solid #ffffff38;background:#11110fdd;color:var(--cream);border-radius:50%;font-size:25px;cursor:pointer;backdrop-filter:blur(8px)}
+#dish-dialog #detail-favorite[aria-pressed=true]{color:var(--gold);border-color:var(--gold);animation:ec-heart .4s ease}
+#dish-dialog .dish-history-bar{position:static;background:none;border:0;padding:0;min-width:0;margin-left:auto!important}
+#dish-dialog #dish-back{background:#11110fea;border-radius:24px;min-height:44px;max-width:100%;white-space:normal;line-height:1.3;text-transform:none;letter-spacing:0}
+.detail-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+.detail-media{position:sticky;top:0;min-width:0;background:#141411;padding:0 0 18px;display:flex;flex-direction:column}
+#dish-dialog .dialog-image{width:100%;aspect-ratio:1;margin:0;border-radius:0;background:#141411;order:0}
+#dish-dialog .dialog-image img{object-fit:contain;object-position:center}
+#dish-dialog .dialog-view-switch{order:2;justify-content:center;padding:12px 15px 0;gap:8px}
+#dish-dialog .view-button{border-radius:22px;min-height:44px;padding:8px 15px}
+#dish-dialog .dish-3d{order:0;margin:0;padding-top:65px}
+#dish-dialog .dish-model{height:clamp(240px,40vh,420px);margin:0}
+#dish-dialog .dialog-content{min-width:0;padding:76px 32px 20px;background:var(--panel)}
+.detail-eyebrow{font-size:.65rem;letter-spacing:.16em;color:var(--gold);margin-bottom:10px}
+#dish-dialog #dialog-title{font-size:clamp(1.65rem,3vw,2.6rem);line-height:1.15;overflow-wrap:anywhere}
+#dish-dialog .detail-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:20px 0 16px}
+#dish-dialog .detail-tabs button{font-size:.78rem;padding:8px 3px;border-radius:10px}
+#dish-dialog #dialog-description{font-size:.94rem;color:var(--cream);line-height:1.65;margin:0 0 20px}
+.detail-heading{font-size:1rem;margin:18px 0 10px;font-weight:600}
+.detail-key-ingredients{display:grid;grid-template-columns:repeat(auto-fit,minmax(82px,1fr));gap:8px}
+.detail-key-ingredients>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;min-height:82px;padding:10px 6px;border:1px solid var(--line);border-radius:14px;background:var(--panel-light);font-size:.75rem;overflow-wrap:anywhere}
+.detail-key-ingredients>div>span:first-child{font-size:1.5rem}
+#dish-dialog .custom-option{border-radius:12px;min-height:52px;font-size:.78rem;flex-wrap:wrap}
+#dish-dialog .custom-option-status{font-size:.66rem}
+#dish-dialog .smart-panel{padding:0;background:none;border:0;margin-top:24px}
+#dish-pairings{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(140px,46%);grid-template-columns:none;overflow-x:auto;scroll-snap-type:x proximity;padding:3px 3px 10px;gap:10px}
+#dish-pairings .pairing-item{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:0 0 10px;border-radius:15px;overflow:hidden;scroll-snap-align:start;position:relative;white-space:normal}
+#dish-pairings .pairing-item img{width:100%;height:auto;aspect-ratio:4/3;border-radius:0}
+#dish-pairings .pairing-item span:nth-child(2){padding:0 10px;font-size:.82rem}
+#dish-pairings .pairing-item>span:last-child{display:none}
+#dish-dialog .detail-order{position:sticky;bottom:0;z-index:7;margin:0;padding:12px 24px calc(12px + env(safe-area-inset-bottom));background:#191916f7;border-top:1px solid var(--line);box-shadow:0 -12px 35px #0003;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+#dish-dialog .dialog-nutrition{border:0;padding:0;margin:0;display:grid;gap:4px;font-size:.8rem}
+#dish-dialog #dialog-price{color:var(--gold);font-size:1.16rem;font-weight:600;display:block}
+#dish-dialog .add-to-cart{margin:0;min-height:49px;border-radius:12px;padding:9px;font-size:.75rem}
+#dish-dialog .cart-feedback,#dish-dialog #detail-cart{grid-column:1/-1;margin:0}
+@media(max-width:760px){
+#dish-dialog{width:100%;max-width:100%;max-height:94vh;max-height:94dvh;margin:auto 0 0;border-radius:24px 24px 0 0;border-bottom:0;border-left:0;border-right:0}
+.detail-layout{display:block}.detail-media{position:relative;padding-bottom:24px}
+#dish-dialog .dialog-image{aspect-ratio:1;max-height:52vh;max-height:52dvh}
+#dish-dialog .dialog-image img{object-fit:cover}
+#dish-dialog .dialog-content{position:relative;margin-top:-20px;border-radius:24px 24px 0 0;padding:24px 18px 18px;z-index:1}
+#dish-dialog .dialog-view-switch{padding-bottom:8px}
+#dish-dialog .detail-order{padding:10px 16px calc(10px + env(safe-area-inset-bottom));grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
+.detail-key-ingredients{grid-template-columns:repeat(3,minmax(0,1fr))}
+#dish-dialog .detail-toolbar{padding:0 12px}
+}
+@media(max-width:350px){#dish-dialog .detail-tabs button{font-size:.68rem}#dish-dialog .customization-list{grid-template-columns:1fr}.detail-key-ingredients{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){#dish-dialog[open],#dish-dialog.is-closing[open]{animation:none!important}}
+
+/* 2.9.1 — precise vector toolbar controls */
+#dish-dialog .detail-toolbar .detail-round{box-sizing:border-box; flex:0 0 48px; width:48px;height:48px;min-height:48px;padding:0;display:grid;place-items:center;line-height:1; border-radius:50%; background:#11110fdd; color:var(--cream);}
+#dish-dialog .detail-icon{display:block;width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}
+#dish-dialog #detail-favorite .detail-icon{width:23px;height:23px;transform:translateY(-.5px);transition:fill .2s ease,stroke .2s ease;}
+#dish-dialog #detail-favorite[aria-pressed=true] .detail-icon{fill:currentColor;}
+#dish-dialog #dish-back .detail-icon{width:19px;height:19px;}
+@media (hover:hover){#dish-dialog .detail-toolbar .detail-round:hover{background:#22221df5;border-color:var(--gold);}}
+@media (prefers-reduced-motion:reduce){#dish-dialog .detail-icon{transition:none!important;}#dish-dialog #detail-favorite[aria-pressed=true]{animation:none!important;}}

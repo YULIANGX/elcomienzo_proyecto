@@ -315,7 +315,7 @@
       if(limit!=="all" && Math.max(d.calories,...(d.variants||[]).map(v=>v.calories))>Number(limit)) return false;
       return allergen==="all" || !patterns[allergen].test(text);
     }
-    function updateFavoriteButton() { const b=document.querySelector("#detail-favorite"); if(!activeDish)return; const saved=favorites.has(activeDish.name); b.textContent=saved?"♥ Quitar favorito":"♡ Guardar favorito";b.setAttribute("aria-pressed",String(saved)); }
+    function updateFavoriteButton() { const b=document.querySelector("#detail-favorite"); if(!activeDish)return; const saved=favorites.has(activeDish.name); b.setAttribute("aria-label",saved?"Quitar favorito":"Guardar favorito");b.setAttribute("aria-pressed",String(saved)); }
     function toggleFavorite(d) { if(!d)return; if(favorites.has(d.name))favorites.delete(d.name);else favorites.add(d.name);try{localStorage.setItem(favoriteKey,JSON.stringify([...favorites]));}catch{} renderMenuTabs();renderMenu(activeMenuFilter);updateFavoriteButton(); }
     function nutritionTotals(items) { return items.reduce((t,i)=>{const d=dishes.find(x=>x.name===i.name); if(!d)return t;const vi=d.variants?.findIndex(v=>v.name===i.variant)??-1;const v=d.variants?.[vi];const m=vi>=0?variantsMacros[vi]:macroEstimates[dishes.indexOf(d)];t.kcal+=(v?.calories??d.calories)*i.quantity;if(m){m.forEach((n,j)=>t.macros[j]+=n*i.quantity);}else t.unknown+=i.quantity;if(i.extras.length||i.ingredients.length!==d.ingredients.length+(v?.ingredients?.length||0))t.custom=true;return t;},{kcal:0,macros:[0,0,0],unknown:0,custom:false}); }
     function renderNutrition(){const n=nutritionTotals(cart);document.querySelector("#cart-nutrition").innerHTML=[["Energía",n.kcal+" kcal"],["Proteínas",n.macros[0]+" g"],["Carbohidratos",n.macros[1]+" g"],["Grasas",n.macros[2]+" g"]].map(([a,b])=>`<div><small>${a}</small><strong>${b}</strong></div>`).join("");document.querySelector("#nutrition-warning").textContent=[n.unknown?`Macros parciales: ${n.unknown} porción(es) sin estimación disponible (bebidas fermentadas).`:"",n.custom?"Tu selección contiene personalizaciones que no se reflejan en este cálculo.":""].filter(Boolean).join(" ");}
@@ -428,6 +428,11 @@
           <span class="ingredient-piece-icon" aria-hidden="true">${ingredientEmoji(ingredient)}</span>${ingredient}
         </span>`).join("") : '<p class="scene-empty">Incluye un ingrediente para verlo en la selección.</p>';
 
+      const keyIngredients = document.querySelector("#detail-key-ingredients");
+      keyIngredients.replaceChildren(...currentDishIngredients().map(name => {
+        const tile=document.createElement("div"), icon=document.createElement("span"), label=document.createElement("span");
+        icon.setAttribute("aria-hidden","true"); icon.textContent=ingredientEmoji(name); label.textContent=name; tile.append(icon,label); return tile;
+      }));
       const extrasPrice = [...selectedExtras].reduce((total, index) => total + activeDish.extras[index].price, 0);
       const basePrice = currentDishVariant()?.priceValue ?? activeDish.priceValue;
       document.querySelector("#dialog-price").textContent = formatPrice(basePrice + extrasPrice);
@@ -691,7 +696,7 @@
       }
     }, true);
     dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) closeDishDialog();
+      if (event.target === dialog) { const r=dialog.getBoundingClientRect(); if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom) closeDishDialog(); }
     });
     dialog.addEventListener("close", () => {
       if (!dialog.open) { dishHistory.length = 0; updateDishHistory(); }

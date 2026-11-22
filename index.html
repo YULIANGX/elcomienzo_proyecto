@@ -112,7 +112,13 @@
   </footer>
 
   <dialog id="dish-dialog" aria-labelledby="dialog-title">
-    <div class="dish-history-bar" id="dish-history-bar" hidden><button type="button" id="dish-back" class="view-button"><span aria-hidden="true">←</span> <span id="dish-back-label">Volver</span></button></div>
+    <div class="detail-toolbar">
+      <button class="dialog-close detail-round" type="button" aria-label="Cerrar detalles y regresar a la carta"><svg class="detail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+      <div class="dish-history-bar" id="dish-history-bar" hidden><button type="button" id="dish-back" class="view-button"><svg class="detail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> <span id="dish-back-label">Volver</span></button></div>
+      <button type="button" class="detail-round" id="detail-favorite" aria-label="Guardar favorito" aria-pressed="false"><svg class="detail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+    </div>
+    <div class="detail-layout">
+    <div class="detail-media">
     <div class="dialog-view-switch" role="group" aria-label="Modo de visualización">
       <button class="view-button" type="button" data-dialog-view="photo" aria-pressed="true">Foto</button>
       <button class="view-button" type="button" data-dialog-view="3d" aria-pressed="false">Vista 3D</button>
@@ -137,9 +143,11 @@
       </div>
       <p class="scene-hint">Arrastra para girar · usa la rueda o pellizca para acercar · en móviles compatibles, prueba AR</p>
     </div>
+    </div>
     <div class="dialog-content">
-      <div class="dialog-top"><h2 id="dialog-title"></h2><button class="dialog-close" type="button" aria-label="Cerrar detalles">×</button></div>
-      <div class="detail-tabs" role="group" aria-label="Información del plato"><button type="button" data-detail-tab="description">Descripción</button><button type="button" data-detail-tab="ingredients">Personalizar</button><button type="button" data-detail-tab="nutrition">Nutrición</button></div><div id="detail-description"><p id="dialog-description"></p></div><div id="detail-ingredients">
+      <div class="detail-eyebrow">EL COMIENZO · CARTA DE AUTOR</div>
+      <div class="dialog-top"><h2 id="dialog-title"></h2></div>
+      <div class="detail-tabs" role="group" aria-label="Información del plato"><button type="button" data-detail-tab="description">Descripción</button><button type="button" data-detail-tab="ingredients">Personalizar</button><button type="button" data-detail-tab="nutrition">Nutrición</button></div><div id="detail-description"><p id="dialog-description"></p><h3 class="detail-heading">Ingredientes principales</h3><div id="detail-key-ingredients" class="detail-key-ingredients"></div></div><div id="detail-ingredients">
       <div class="variant-selector" id="dialog-variants" hidden>
         <span class="dialog-label" id="dialog-variant-label">Elige una preparación</span>
         <div class="customization-list" id="dialog-variant-options" role="radiogroup" aria-labelledby="dialog-variant-label"></div>
@@ -148,14 +156,16 @@
       <div class="customization-list" id="dialog-ingredients"></div>
       <span class="dialog-label">Añade un extra</span>
       <div class="customization-list" id="dialog-extras"></div>
-      </div><div id="detail-nutrition" hidden><p id="detail-macros"></p><p class="smart-note">Valores estimados de la receta base; no incluyen personalizaciones.</p></div><div class="detail-order"><div class="dialog-nutrition">
+      </div><div id="detail-nutrition" hidden><p id="detail-macros"></p><p class="smart-note">Valores estimados de la receta base; no incluyen personalizaciones.</p></div><p class="customization-note" id="customization-note"></p><section class="smart-panel"><h3>Combina tu plato</h3><p class="smart-note">Sugerencias según el plato seleccionado y tus filtros.</p><div id="dish-pairings" class="pairing-list"></div></section>
+    </div>
+    </div>
+    <div class="detail-order"><div class="dialog-nutrition">
         <span><strong id="dialog-calories"></strong> kcal base estimadas</span>
         <span>Total estimado <strong id="dialog-price"></strong></span>
       </div>
       <button class="button add-to-cart" id="add-to-cart" type="button">Agregar al pedido</button>
       <p class="cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p><button class="cart-secondary" id="detail-cart" type="button" hidden>Ver mi pedido →</button></div>
-      <p class="customization-note" id="customization-note"></p><button type="button" class="cart-secondary" id="detail-favorite" aria-pressed="false">♡ Guardar favorito</button><section class="smart-panel"><h3>Combina tu plato</h3><p class="smart-note">Sugerencias según el plato seleccionado y tus filtros.</p><div id="dish-pairings" class="pairing-list"></div></section>
-    </div>
+      
   </dialog>
 
   <dialog id="cart-dialog" aria-labelledby="cart-title">

@@ -341,3 +341,24 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
+
+/* El Comienzo 2.3 */
+.cart-thumb {width:64px;height:64px;object-fit:cover;border-radius:10px;flex:none;}
+.cart-item {border-radius:14px;}
+.cart-item-heading h3 {flex:1;min-width:0;}
+.cart-line-price {display:grid;text-align:right;gap:4px;color:var(--gold);}
+.cart-line-price small {color:var(--muted);font-size:.65rem;}
+.cart-message {white-space:pre-wrap;overflow-wrap:anywhere;}
+.cart-quantity button {min-width:40px;min-height:40px;border-radius:8px;}
+.menu-search-wrap {display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 20px;color:var(--muted);font-size:.85rem;}
+.menu-search-wrap input {flex:1;min-width:160px;background:#191916;border:1px solid var(--line);border-radius:10px;color:var(--cream);padding:12px;font:inherit;}
+.menu-search-wrap input:focus {outline:2px solid var(--gold);outline-offset:2px;}
+#menu {scroll-margin-top:100px;}
+
+/* El Comienzo 2.4 */
+.smart-filters{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:16px 0 22px;padding:16px;border:1px solid #3c382e;border-radius:16px;background:#191916}.smart-filters label{display:grid;gap:6px;flex:1 1 170px;color:#a7a397;font-size:.82rem}.smart-filters select{width:100%;min-width:0;background:#22221d;color:#f1eee6;border:1px solid #514637;border-radius:9px;padding:10px;font:inherit;color-scheme:dark}.smart-note{font-size:.78rem;line-height:1.55;color:#a7a397;margin:8px 0}.smart-filters .smart-note{flex-basis:100%;margin:0}.favorite-button{position:absolute;right:12px;top:12px;z-index:3;border:1px solid #c5a46d;border-radius:50%;width:42px;height:42px;background:#11110fe8;color:#c5a46d;font-size:24px;cursor:pointer;display:grid;place-items:center}.favorite-button[aria-pressed=true]{background:#c5a46d;color:#11110f}.smart-panel{margin:18px 0;padding:14px;border:1px solid #3c382e;border-radius:14px;background:#191916}.smart-panel h3{color:#f1eee6;font-size:1rem;margin:0 0 12px}.nutrition-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.nutrition-grid div{display:grid;gap:4px;background:#22221d;padding:10px;border-radius:9px}.nutrition-grid small,.pairing-item small{color:#a7a397;font-size:.75rem}.nutrition-grid strong{color:#c5a46d;font-size:1.15rem}.pairing-list{display:grid;gap:8px}.pairing-item{display:flex;align-items:center;gap:12px;text-align:left;width:100%;border:1px solid #3c382e;background:#22221d;color:#f1eee6;padding:8px;border-radius:10px;cursor:pointer;font:inherit}.pairing-item img{width:56px;height:56px;border-radius:8px;object-fit:cover}.pairing-item span:nth-child(2){flex:1;display:grid;gap:4px}.pairing-item:hover{border-color:#c5a46d}.favorite-button:focus-visible,.pairing-item:focus-visible,.smart-filters select:focus-visible{outline:2px solid #c5a46d;outline-offset:3px}#detail-favorite{margin-top:12px;width:100%}@media(max-width:520px){.smart-filters{padding:12px;gap:10px}.smart-filters label{flex-basis:100%}.smart-filters button{width:100%}}
+
+/* Historial de recomendaciones */
+.dish-history-bar { position: sticky; top: 0; z-index: 5; padding: 10px 20px; background: #191916; border-bottom: 1px solid rgba(197,164,109,.2); }
+.dish-history-bar[hidden] { display: none; }
+#dish-back { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; text-align: left; white-space: normal; color: #C5A46D; }

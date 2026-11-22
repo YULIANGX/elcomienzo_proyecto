@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=24">
   <script id="model-viewer-library" type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 </head>
 <body>
@@ -64,6 +64,12 @@
         <h2 class="serif">Una carta para <em>disfrutar.</em></h2>
         <p>Platos de temporada, sabores que sorprenden y el mejor producto en su momento. Explora la carta y descubre cada detalle.</p>
       </div>
+      <div class="menu-search-wrap"><label for="menu-search">Buscar en la carta</label><input id="menu-search" type="search" placeholder="Ej. café, pollo, lulo…"><span id="menu-results" role="status"></span></div>
+      <div class="smart-filters" aria-label="Preferencias alimentarias">
+<label>Tipo de alimentación<select id="diet-filter"><option value="all">Todas</option><option value="plant">Ingredientes vegetales aparentes</option><option value="vegetarian">Sin carne o pescado declarados</option></select></label>
+<label>Calorías base<select id="calorie-filter"><option value="all">Sin límite</option><option value="300">Hasta 300 kcal</option><option value="500">Hasta 500 kcal</option><option value="700">Hasta 700 kcal</option></select></label>
+<label>Evitar ingredientes declarados<select id="allergen-filter"><option value="all">Sin preferencia</option><option value="milk">Lácteos</option><option value="wheat">Trigo / gluten</option><option value="egg">Huevo</option><option value="fish">Pescado</option><option value="shell">Mariscos</option><option value="nuts">Frutos secos</option></select></label><button class="cart-secondary" id="reset-filters" type="button">Restablecer filtros</button>
+<p class="smart-note">Orientativo: se revisan ingredientes declarados de la receta base y sus variantes, no trazas ni contaminación cruzada. No garantiza ausencia de alérgenos; confirma con cocina.</p></div>
       <div class="menu-tabs" role="group" aria-label="Filtrar platos por categoría"></div>
       <div class="menu-grid" id="menu-grid" aria-live="polite"></div>
       <p class="menu-hint">Mueve el cursor sobre un plato para explorar · Selecciona «Ver detalles» para conocer sus ingredientes · Precios de referencia en COP</p>
@@ -106,6 +112,7 @@
   </footer>
 
   <dialog id="dish-dialog" aria-labelledby="dialog-title">
+    <div class="dish-history-bar" id="dish-history-bar" hidden><button type="button" id="dish-back" class="view-button"><span aria-hidden="true">←</span> <span id="dish-back-label">Volver</span></button></div>
     <div class="dialog-view-switch" role="group" aria-label="Modo de visualización">
       <button class="view-button" type="button" data-dialog-view="photo" aria-pressed="true">Foto</button>
       <button class="view-button" type="button" data-dialog-view="3d" aria-pressed="false">Vista 3D</button>
@@ -147,7 +154,7 @@
       </div>
       <button class="button add-to-cart" id="add-to-cart" type="button">Agregar al pedido</button>
       <p class="cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p>
-      <p class="customization-note" id="customization-note"></p>
+      <p class="customization-note" id="customization-note"></p><button type="button" class="cart-secondary" id="detail-favorite" aria-pressed="false">♡ Guardar favorito</button><section class="smart-panel"><h3>Combina tu plato</h3><p class="smart-note">Sugerencias según el plato seleccionado y tus filtros.</p><div id="dish-pairings" class="pairing-list"></div></section>
     </div>
   </dialog>
 
@@ -159,15 +166,15 @@
       </div>
       <div class="cart-items" id="cart-items" aria-live="polite"></div>
       <div class="cart-total"><span>Total estimado</span><strong id="cart-total"></strong></div>
-      <p class="cart-message" id="cart-message" role="status" hidden></p>
+      <section class="smart-panel" aria-label="Nutrición del pedido"><h3>Aporte nutricional estimado</h3><div id="cart-nutrition" class="nutrition-grid" aria-live="polite"></div><p class="smart-note">Calorías de la carta y macronutrientes orientativos de recetas base, multiplicados por cantidad. No incluyen ajustes por extras o ingredientes retirados; no son datos de laboratorio.</p><p id="nutrition-warning" class="smart-note"></p></section><section class="smart-panel"><h3>Completa tu experiencia</h3><div id="cart-pairings" class="pairing-list"></div></section><p class="cart-message" id="cart-message" role="status" hidden></p>
       <div class="cart-actions">
         <button class="cart-secondary" id="cart-clear" type="button" disabled>Vaciar</button>
-        <button class="button" id="cart-confirm" type="button" disabled>Confirmar pedido</button>
+        <button class="button" id="cart-confirm" type="button" disabled>Copiar selección</button>
       </div>
-      <p class="cart-note">Demostración: el pedido no se envía a cocina ni realiza un pago.</p>
+      <p class="cart-note">Selección guardada en este navegador. No se envía a cocina ni genera cobros.</p>
     </div>
   </dialog>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=24"></script>
 </body>
 </html>

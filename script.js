@@ -294,7 +294,56 @@
     let activeMenuFilter = "todos";
     let dialogCloseTimer;
     let cartCloseTimer;
-    let cart = [];
+    const cartStorageKey = "el-comienzo-cart-v1";
+    let cart = loadCart();
+
+    const normalizeText = value => String(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const favoriteKey = "el-comienzo-favorites-v1";
+    let favorites = new Set();
+    try { const saved = JSON.parse(localStorage.getItem(favoriteKey) || "[]"); if (Array.isArray(saved)) favorites = new Set(saved.filter(n => dishes.some(d => d.name === n))); } catch {}
+    const macroEstimates = [
+      [25,35,31],[4,4,0],[30,75,29],[18,65,32],[15,46,21],[20,59,23],[4,55,17],[36,19,29],[20,100,22],[16,70,20],[6,54,21],[0,1,0],[0,11,0],[5,9,6],[8,38,6],[0,30,0],[2,29,15],null,[0,35,0],[0,0,0],[0,0,0],[0,28,0],[8,35,6],[1,44,0],[8,43,6],null,null,[45,44,32],[37,40,26],[25,63,40],[43,40,29],[7,39,26],[5,72,8],[2,49,12],[4,40,13],[18,48,20],[22,20,47],[20,52,23],[25,35,12],[48,100,43],[32,68,19],[40,40,49],[39,52,30],[40,55,48],[34,65,28],[40,75,24],[10,66,19],[8,42,21],[8,62,12],[8,66,18],[1,35,0],[0,24,0],[0,30,0],[1,38,6],[4,45,13],[4,48,15],[2,60,5],[11,40,16]
+    ];
+    const variantsMacros = [[18,65,32],[12,60,21]];
+    const patterns = {milk:/queso|mozzarella|parmesano|mantequilla|manteca|suero|yogur|arequipe|holandesa|helado|\bcrema\b|\bleche\b/,wheat:/trigo|muffin|pan plano|bizcocho|galleta|oblea|crumble|malta|avena|milo/,egg:/huevo|holandesa|bizcocho|crema inglesa/,fish:/salmon|trucha|pescado|pargo/,shell:/camaron|camarones|mejillon|marisco/,nuts:/almendra|avellana|nuez|pinon|mani|pistacho/};
+    const animal = /carne|cerdo|res\b|pollo|panceta|chicharron|costilla|salmon|trucha|pescado|pargo|camaron|camarones|mejillon|marisco|piel crocante|fondo de res|caldo/;
+    function declared(d) { return [...d.ingredients,...(d.variants || []).flatMap(v=>v.ingredients || [])].map(i=>normalizeText(i).replace(/leche de coco|crema de coco/g,"coco")).join(" "); }
+    function matchesPreferences(d) {
+      const text=declared(d), diet=document.querySelector("#diet-filter").value, limit=document.querySelector("#calorie-filter").value, allergen=document.querySelector("#allergen-filter").value;
+      if(diet!=="all" && animal.test(text)) return false;
+      if(diet==="plant" && (patterns.milk.test(text)||patterns.egg.test(text)||/miel|bizcocho|galleta|oblea|milo|chocolate de mesa/.test(text))) return false;
+      if(limit!=="all" && Math.max(d.calories,...(d.variants||[]).map(v=>v.calories))>Number(limit)) return false;
+      return allergen==="all" || !patterns[allergen].test(text);
+    }
+    function updateFavoriteButton() { const b=document.querySelector("#detail-favorite"); if(!activeDish)return; const saved=favorites.has(activeDish.name); b.textContent=saved?"♥ Quitar favorito":"♡ Guardar favorito";b.setAttribute("aria-pressed",String(saved)); }
+    function toggleFavorite(d) { if(!d)return; if(favorites.has(d.name))favorites.delete(d.name);else favorites.add(d.name);try{localStorage.setItem(favoriteKey,JSON.stringify([...favorites]));}catch{} renderMenuTabs();renderMenu(activeMenuFilter);updateFavoriteButton(); }
+    function nutritionTotals(items) { return items.reduce((t,i)=>{const d=dishes.find(x=>x.name===i.name); if(!d)return t;const vi=d.variants?.findIndex(v=>v.name===i.variant)??-1;const v=d.variants?.[vi];const m=vi>=0?variantsMacros[vi]:macroEstimates[dishes.indexOf(d)];t.kcal+=(v?.calories??d.calories)*i.quantity;if(m){m.forEach((n,j)=>t.macros[j]+=n*i.quantity);}else t.unknown+=i.quantity;if(i.extras.length||i.ingredients.length!==d.ingredients.length+(v?.ingredients?.length||0))t.custom=true;return t;},{kcal:0,macros:[0,0,0],unknown:0,custom:false}); }
+    function renderNutrition(){const n=nutritionTotals(cart);document.querySelector("#cart-nutrition").innerHTML=[["Energía",n.kcal+" kcal"],["Proteínas",n.macros[0]+" g"],["Carbohidratos",n.macros[1]+" g"],["Grasas",n.macros[2]+" g"]].map(([a,b])=>`<div><small>${a}</small><strong>${b}</strong></div>`).join("");document.querySelector("#nutrition-warning").textContent=[n.unknown?`Macros parciales: ${n.unknown} porción(es) sin estimación disponible (bebidas fermentadas).`:"",n.custom?"Tu selección contiene personalizaciones que no se reflejan en este cálculo.":""].filter(Boolean).join(" ");}
+    const pairingRules = {sea:[38,54,50,47],meat:[35,34,50,31],veg:[6,55,15,48],sweet:[11,51,19],drink:[35,27,31]};
+    function pairings(anchor,excluded=[]){const text=anchor?declared(anchor):"";const key=!anchor?"meat":anchor.category==="postres"?"sweet":anchor.category==="bebidas"?"drink":patterns.fish.test(text)||patterns.shell.test(text)?"sea":animal.test(text)?"meat":"veg";const used=new Set(excluded.map(d=>d.name)); if(anchor)used.add(anchor.name);const categories=anchor?.category==="postres"?["bebidas"]:anchor?.category==="bebidas"?["entradas","principales","postres"]:["entradas","acompanamientos","bebidas","postres"];const all=[...pairingRules[key].map(i=>dishes[i]),...dishes];return categories.filter(cat=>cat!==anchor?.category&&!excluded.some(d=>d.category===cat)).map(cat=>all.find(d=>d.category===cat&&!used.has(d.name)&&matchesPreferences(d))).filter(Boolean).slice(0,3);}
+    function renderPairings(target,anchor,excluded=[]){const list=pairings(anchor,excluded);document.querySelector(target).innerHTML=list.length?list.map(d=>`<button type="button" class="pairing-item" data-pairing="${dishes.indexOf(d)}"><img src="${d.image}" alt="" loading="lazy"><span>${d.name}<small>${formatPrice(d.priceValue)} · ${d.category}</small></span><span aria-hidden="true">→</span></button>`).join(""):'<p class="smart-note">No hay sugerencias adicionales con tus filtros actuales.</p>';}
+
+    function loadCart() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(cartStorageKey) || "[]");
+        if (!Array.isArray(saved)) return [];
+        return saved.flatMap(item => {
+          if (!item || !Number.isInteger(item.quantity) || item.quantity < 1) return [];
+          const dish = dishes.find(d => d.name === item.name);
+          if (!dish) return [];
+          const variant = dish.variants?.find(v => v.name === item.variant);
+          if (dish.variants?.length && !variant) return [];
+          const ingredients = [...dish.ingredients, ...(variant?.ingredients || [])].filter(i => Array.isArray(item.ingredients) && item.ingredients.includes(i));
+          const extras = dish.extras.filter(e => Array.isArray(item.extras) && item.extras.includes(e.name));
+          const names = extras.map(e => e.name);
+          return [{key: JSON.stringify([dish.name, variant?.name || "", [...ingredients].sort(), [...names].sort()]), name:dish.name, variant:variant?.name || "", ingredients, extras:names, quantity:Math.min(99,item.quantity), unitPrice:(variant?.priceValue ?? dish.priceValue)+extras.reduce((a,e)=>a+e.price,0)}];
+        });
+      } catch { return []; }
+    }
+    function saveCart() { try { localStorage.setItem(cartStorageKey, JSON.stringify(cart)); } catch {} }
+    function cartSummary() {
+      return ["EL COMIENZO — Mi selección", ...cart.map(i => `${i.quantity} × ${i.name}${i.variant ? ' ('+i.variant+')' : ''} — ${formatPrice(i.unitPrice*i.quantity)}\nIncluye: ${i.ingredients.join(', ') || 'Sin ingredientes incluidos'}${i.extras.length ? '\nExtras: '+i.extras.join(', ') : ''}`), `Total estimado: ${formatPrice(cart.reduce((a,i)=>a+i.unitPrice*i.quantity,0))}`, "Simulación: no se envía a cocina ni genera cobro."].join("\n\n");
+    }
 
     function ingredientEmoji(name) {
       const ingredient = name.toLocaleLowerCase("es");
@@ -385,6 +434,10 @@
     }
 
     function renderCart() {
+      saveCart();
+      renderNutrition();
+      const ordered=cart.map(i=>dishes.find(d=>d.name===i.name)).filter(Boolean);
+      renderPairings("#cart-pairings",ordered.find(d=>d.category==="principales")||ordered[0],ordered);
       const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
       const total = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
       cartCount.textContent = String(itemCount);
@@ -396,6 +449,7 @@
       cartItems.innerHTML = cart.length ? cart.map((item, index) => `
         <article class="cart-item">
           <div class="cart-item-heading">
+            <img class="cart-thumb" src="${dishes.find(d => d.name === item.name)?.image || ""}" alt="" loading="lazy">
             <h3>${item.name}</h3>
             <button class="cart-remove" type="button" data-cart-remove="${index}" aria-label="Quitar ${item.name} del pedido">Quitar</button>
           </div>
@@ -408,7 +462,7 @@
               <span aria-live="polite">${item.quantity}</span>
               <button type="button" data-cart-quantity="1" data-cart-index="${index}" aria-label="Aumentar cantidad de ${item.name}">+</button>
             </div>
-            <strong>${formatPrice(item.unitPrice * item.quantity)}</strong>
+            <div class="cart-line-price"><small>${formatPrice(item.unitPrice)} / unidad</small><strong>${formatPrice(item.unitPrice * item.quantity)}</strong></div>
           </div>
         </article>`).join("") : '<p class="cart-empty">Tu pedido está vacío.</p>';
     }
@@ -428,7 +482,7 @@
       ]);
       const existingItem = cart.find((item) => item.key === key);
       if (existingItem) {
-        existingItem.quantity += 1;
+        existingItem.quantity = Math.min(99, existingItem.quantity + 1);
       } else {
         cart.push({
           key,
@@ -467,11 +521,36 @@
       return hasModel;
     }
 
-    function openDishDialog(dishIndex) {
+    const dishHistory = [];
+    function updateDishHistory() {
+      const previous = dishHistory[dishHistory.length - 1];
+      document.querySelector("#dish-history-bar").hidden = !previous;
+      document.querySelector("#dish-back-label").textContent = previous?.cart ? "Volver a mi pedido" : previous ? `Volver a ${dishes[previous.index].name}` : "Volver";
+    }
+    function captureDish() {
+      return { index: dishes.indexOf(activeDish), variant: selectedVariantIndex,
+        ingredients: [...selectedIngredients], extras: [...selectedExtras], scroll: dialog.scrollTop,
+        view: document.querySelector("#dish-3d").hidden ? "photo" : "3d" };
+    }
+    document.querySelector("#dish-back").addEventListener("click", () => {
+      const previous = dishHistory.pop();
+      if (!previous) return;
+      if (previous.cart) {
+        dialog.close();
+        renderCart();
+        cartDialog.showModal();
+        cartDialog.scrollTop = previous.scroll;
+        return;
+      }
+      openDishDialog(previous.index, previous);
+      document.querySelector("#dish-back").focus({preventScroll:true});
+      dialog.scrollTop = previous.scroll;
+    });
+    function openDishDialog(dishIndex, restore = null) {
       activeDish = dishes[dishIndex];
-      selectedVariantIndex = 0;
-      selectedIngredients = new Set(currentDishIngredients());
-      selectedExtras = new Set();
+      selectedVariantIndex = restore?.variant ?? 0;
+      selectedIngredients = new Set(restore?.ingredients ?? currentDishIngredients());
+      selectedExtras = new Set(restore?.extras ?? []);
       const hasModel = loadActiveDishModel();
       document.querySelector("#dialog-title").textContent = activeDish.name;
       document.querySelector("#dialog-description").textContent = activeDish.description;
@@ -497,12 +576,32 @@
           : "El modelo 3D muestra la receta base; la personalización se guarda en el carrito y no recalcula las calorías."
         : "La imagen es una referencia de presentación; los cambios se guardan en el carrito y las calorías son estimadas.";
       renderCustomization();
+      if (restore) {
+        dialogIngredients.querySelectorAll("[data-ingredient-index]").forEach(input => {
+          const ingredient = currentDishIngredients()[Number(input.dataset.ingredientIndex)];
+          input.checked = selectedIngredients.has(ingredient);
+          input.setAttribute("aria-label", `${input.checked ? "Quitar" : "Volver a incluir"} ${ingredient}`);
+          input.parentElement.classList.toggle("is-selected", input.checked);
+          input.parentElement.querySelector(".custom-option-status").textContent = input.checked ? "Incluido" : "Quitado";
+        });
+        dialogExtras.querySelectorAll("[data-extra-index]").forEach(input => {
+          const index = Number(input.dataset.extraIndex), extra = activeDish.extras[index];
+          input.checked = selectedExtras.has(index);
+          input.setAttribute("aria-label", `${input.checked ? "Quitar" : "Agregar"} ${extra.name}`);
+          input.parentElement.classList.toggle("is-selected", input.checked);
+          input.parentElement.querySelector(".custom-option-status").textContent = input.checked ? "Sumado" : formatPrice(extra.price);
+        });
+      }
       updateDishPreview();
       modelStatus.hidden = true;
-      setDialogView("photo");
+      setDialogView(hasModel && restore?.view === "3d" ? "3d" : "photo");
       dialog.classList.remove("is-closing");
       window.clearTimeout(dialogCloseTimer);
-      dialog.showModal();
+      updateFavoriteButton();
+      renderPairings("#dish-pairings",activeDish);
+      updateDishHistory();
+      if (!dialog.open) dialog.showModal();
+      dialog.scrollTop = restore?.scroll ?? 0;
     }
 
     dishModel.addEventListener("progress", (event) => {
@@ -585,6 +684,7 @@
       if (event.target === dialog) closeDishDialog();
     });
     dialog.addEventListener("close", () => {
+      if (!dialog.open) { dishHistory.length = 0; updateDishHistory(); }
       window.clearTimeout(dialogCloseTimer);
       dialog.classList.remove("is-closing");
     });
@@ -622,7 +722,7 @@
       if (quantityButton) {
         const item = cart[Number(quantityButton.dataset.cartIndex)];
         if (item) {
-          item.quantity = Math.max(1, item.quantity + Number(quantityButton.dataset.cartQuantity));
+          item.quantity = Math.min(99, Math.max(1, item.quantity + Number(quantityButton.dataset.cartQuantity)));
           cartMessage.hidden = true;
           cartMessage.textContent = "";
           renderCart();
@@ -644,12 +744,15 @@
       cartMessage.textContent = "";
       renderCart();
     });
-    document.querySelector("#cart-confirm").addEventListener("click", () => {
+    document.querySelector("#cart-confirm").addEventListener("click", async () => {
       if (!cart.length) return;
-      const total = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-      cart = [];
-      renderCart();
-      cartMessage.textContent = `Pedido confirmado como demostración por ${formatPrice(total)}. No se envió a cocina ni se realizó ningún pago.`;
+      const summary = cartSummary();
+      try {
+        await navigator.clipboard.writeText(summary);
+        cartMessage.textContent = "Selección copiada. Puedes mostrarla al mesero. No se ha enviado ningún pedido.";
+      } catch {
+        cartMessage.textContent = summary;
+      }
       cartMessage.hidden = false;
     });
 
@@ -673,6 +776,7 @@
       };
       const filters = [
         { id: "todos", label: "Todo", count: dishes.length },
+        { id: "favoritos", label: "♥ Favoritos", count: favorites.size },
         ...categories.map((category) => ({
           id: category,
           label: labels[category] || category.split(/[-_]/).map((part) => part.charAt(0).toLocaleUpperCase("es") + part.slice(1)).join(" "),
@@ -687,15 +791,19 @@
     }
 
     function renderMenu(filter = "todos") {
-      const visibleDishes = filter === "todos" ? dishes : dishes.filter((dish) => dish.category === filter);
+      const normalize = value => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      const query = normalize(document.querySelector("#menu-search").value.trim());
+      const visibleDishes = dishes.filter(dish => (filter === "todos" || (filter === "favoritos" ? favorites.has(dish.name) : dish.category === filter)) && matchesPreferences(dish) && normalize([dish.name, dish.description, ...dish.ingredients].join(" ")).includes(query));
+      document.querySelector("#menu-results").textContent = `${visibleDishes.length} productos`;
+      if (!visibleDishes.length) { grid.innerHTML = '<p class="cart-empty">No encontramos platos con esa búsqueda.</p>'; return; }
       grid.innerHTML = visibleDishes.map((dish, index) => {
         const dishIndex = dishes.indexOf(dish);
         return `
-          <article class="dish-card reveal" data-dish-index="${dishIndex}" style="transition-delay:${index * 70}ms">
+          <article class="dish-card reveal" data-dish-index="${dishIndex}" style="transition-delay:${Math.min(index, 6) * 70}ms">
             <div class="dish-photo">
               <img src="${dish.image}" alt="${dish.alt}" loading="lazy">
               ${dish.imageCredit ? `<a class="photo-credit" href="${dish.imageCredit.source}" target="_blank" rel="noopener noreferrer">Foto: ${dish.imageCredit.author} · ${dish.imageCredit.license}</a>` : ""}
-              <span class="dish-badge">${dish.label}</span>
+              <span class="dish-badge">${dish.label}</span><button class="favorite-button" type="button" data-favorite="${dishIndex}" aria-label="Favorito: ${dish.name}" aria-pressed="${favorites.has(dish.name)}">${favorites.has(dish.name)?"♥":"♡"}</button>
             </div>
             <div class="dish-body">
               <div class="dish-title-row"><h3>${dish.name}</h3><span class="dish-price">${dish.pricePrefix || ""}${formatPrice(dish.priceValue)}</span></div>
@@ -719,8 +827,10 @@
     });
 
     grid.addEventListener("click", (event) => {
+      const fav=event.target.closest("[data-favorite]"); if(fav){toggleFavorite(dishes[Number(fav.dataset.favorite)]);return;}
       const button = event.target.closest("[data-details]");
       if (!button) return;
+      dishHistory.length = 0;
       openDishDialog(Number(button.dataset.details));
     });
 
@@ -784,6 +894,11 @@
       document.querySelectorAll(".reveal:not(.is-visible)").forEach((element) => revealObserver.observe(element));
     }
 
+    document.querySelector("#menu-search").addEventListener("input", () => renderMenu(activeMenuFilter));
+    document.querySelector("#detail-favorite").addEventListener("click",()=>toggleFavorite(activeDish));
+    ["#diet-filter","#calorie-filter","#allergen-filter"].forEach(id=>document.querySelector(id).addEventListener("change",()=>{renderMenu(activeMenuFilter);renderCart();}));
+    document.querySelector("#reset-filters").addEventListener("click",()=>{["#diet-filter","#calorie-filter","#allergen-filter"].forEach(id=>document.querySelector(id).value="all");document.querySelector("#menu-search").value="";activeMenuFilter="todos";renderMenuTabs();renderMenu();renderCart();});
+    ["#dish-pairings","#cart-pairings"].forEach(id=>document.querySelector(id).addEventListener("click",e=>{const b=e.target.closest("[data-pairing]");if(!b)return;if(cartDialog.open){dishHistory.length=0;dishHistory.push({cart:true,scroll:cartDialog.scrollTop});cartDialog.close();}else if(dialog.open && activeDish){dishHistory.push(captureDish());}openDishDialog(Number(b.dataset.pairing));dialog.scrollTop=0;document.querySelector("#dish-back").focus({preventScroll:true});}));
     renderMenuTabs();
     renderCart();
     renderMenu();

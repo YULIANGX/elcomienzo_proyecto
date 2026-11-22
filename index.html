@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=27">
   <script id="model-viewer-library" type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 </head>
 <body>
@@ -68,7 +68,7 @@
       <div class="smart-filters" aria-label="Preferencias alimentarias">
 <label>Tipo de alimentación<select id="diet-filter"><option value="all">Todas</option><option value="plant">Ingredientes vegetales aparentes</option><option value="vegetarian">Sin carne o pescado declarados</option></select></label>
 <label>Calorías base<select id="calorie-filter"><option value="all">Sin límite</option><option value="300">Hasta 300 kcal</option><option value="500">Hasta 500 kcal</option><option value="700">Hasta 700 kcal</option></select></label>
-<label>Evitar ingredientes declarados<select id="allergen-filter"><option value="all">Sin preferencia</option><option value="milk">Lácteos</option><option value="wheat">Trigo / gluten</option><option value="egg">Huevo</option><option value="fish">Pescado</option><option value="shell">Mariscos</option><option value="nuts">Frutos secos</option></select></label><button class="cart-secondary" id="reset-filters" type="button">Restablecer filtros</button>
+<label>Evitar ingredientes declarados<select id="allergen-filter"><option value="all">Sin preferencia</option><option value="milk">Lácteos</option><option value="wheat">Trigo / gluten</option><option value="egg">Huevo</option><option value="fish">Pescado</option><option value="shell">Mariscos</option><option value="nuts">Frutos secos</option></select></label><label>Precio máximo (COP)<input id="price-filter" type="number" min="0" step="1000" placeholder="Sin límite"></label><label>Orden<select id="price-sort"><option value="default">Original</option><option value="asc">Menor precio</option><option value="desc">Mayor precio</option></select></label><button class="cart-secondary" id="reset-filters" type="button">Restablecer filtros</button>
 <p class="smart-note">Orientativo: se revisan ingredientes declarados de la receta base y sus variantes, no trazas ni contaminación cruzada. No garantiza ausencia de alérgenos; confirma con cocina.</p></div>
       <div class="menu-tabs" role="group" aria-label="Filtrar platos por categoría"></div>
       <div class="menu-grid" id="menu-grid" aria-live="polite"></div>
@@ -139,7 +139,7 @@
     </div>
     <div class="dialog-content">
       <div class="dialog-top"><h2 id="dialog-title"></h2><button class="dialog-close" type="button" aria-label="Cerrar detalles">×</button></div>
-      <p id="dialog-description"></p>
+      <div class="detail-tabs" role="group" aria-label="Información del plato"><button type="button" data-detail-tab="description">Descripción</button><button type="button" data-detail-tab="ingredients">Personalizar</button><button type="button" data-detail-tab="nutrition">Nutrición</button></div><div id="detail-description"><p id="dialog-description"></p></div><div id="detail-ingredients">
       <div class="variant-selector" id="dialog-variants" hidden>
         <span class="dialog-label" id="dialog-variant-label">Elige una preparación</span>
         <div class="customization-list" id="dialog-variant-options" role="radiogroup" aria-labelledby="dialog-variant-label"></div>
@@ -148,17 +148,27 @@
       <div class="customization-list" id="dialog-ingredients"></div>
       <span class="dialog-label">Añade un extra</span>
       <div class="customization-list" id="dialog-extras"></div>
-      <div class="dialog-nutrition">
+      </div><div id="detail-nutrition" hidden><p id="detail-macros"></p><p class="smart-note">Valores estimados de la receta base; no incluyen personalizaciones.</p></div><div class="detail-order"><div class="dialog-nutrition">
         <span><strong id="dialog-calories"></strong> kcal base estimadas</span>
         <span>Total estimado <strong id="dialog-price"></strong></span>
       </div>
       <button class="button add-to-cart" id="add-to-cart" type="button">Agregar al pedido</button>
-      <p class="cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p>
+      <p class="cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p><button class="cart-secondary" id="detail-cart" type="button" hidden>Ver mi pedido →</button></div>
       <p class="customization-note" id="customization-note"></p><button type="button" class="cart-secondary" id="detail-favorite" aria-pressed="false">♡ Guardar favorito</button><section class="smart-panel"><h3>Combina tu plato</h3><p class="smart-note">Sugerencias según el plato seleccionado y tus filtros.</p><div id="dish-pairings" class="pairing-list"></div></section>
     </div>
   </dialog>
 
   <dialog id="cart-dialog" aria-labelledby="cart-title">
+    <div class="undo-anchor" id="undo-anchor" hidden>
+      <div id="undo-panel" class="undo-snackbar">
+        <div class="undo-copy" role="status" aria-live="polite"><strong id="undo-message">Producto eliminado</strong><span>¿Deseas deshacer esta acción?</span></div>
+        <button id="undo-cart" type="button">Deshacer</button>
+        <div class="undo-progress" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div class="undo-anchor" id="restore-anchor" hidden>
+      <div id="restore-panel" class="undo-snackbar" role="status" aria-live="polite"><span class="restore-check" aria-hidden="true">✓</span><strong>Selección restaurada</strong><div class="undo-progress" aria-hidden="true"></div></div>
+    </div>
     <div class="cart-content">
       <div class="dialog-top">
         <h2 id="cart-title">Mi pedido</h2>
@@ -167,7 +177,7 @@
       <div class="cart-items" id="cart-items" aria-live="polite"></div>
       <div class="cart-total"><span>Total estimado</span><strong id="cart-total"></strong></div>
       <section class="smart-panel" aria-label="Nutrición del pedido"><h3>Aporte nutricional estimado</h3><div id="cart-nutrition" class="nutrition-grid" aria-live="polite"></div><p class="smart-note">Calorías de la carta y macronutrientes orientativos de recetas base, multiplicados por cantidad. No incluyen ajustes por extras o ingredientes retirados; no son datos de laboratorio.</p><p id="nutrition-warning" class="smart-note"></p></section><section class="smart-panel"><h3>Completa tu experiencia</h3><div id="cart-pairings" class="pairing-list"></div></section><p class="cart-message" id="cart-message" role="status" hidden></p>
-      <div class="cart-actions">
+      <div class="cart-actions"><button class="cart-secondary" id="cart-image" type="button">Descargar resumen PNG</button><button class="cart-secondary" type="button" data-continue>Seguir explorando</button>
         <button class="cart-secondary" id="cart-clear" type="button" disabled>Vaciar</button>
         <button class="button" id="cart-confirm" type="button" disabled>Copiar selección</button>
       </div>
@@ -175,6 +185,11 @@
     </div>
   </dialog>
 
-  <script src="script.js?v=24"></script>
+  <div id="quick-notice" role="status" hidden></div>
+  <button type="button" id="floating-order" hidden><span>Mi pedido · <span id="float-count">0</span></span><strong id="float-total"></strong> →</button>
+  <nav class="mobile-dock" aria-label="Accesos rápidos"><a href="#inicio">⌂<span>Inicio</span></a><a href="#menu">☰<span>Menú</span></a><button id="dock-favorites" type="button">♡<span>Favoritos</span></button><button id="dock-cart" type="button">▣<span>Mi pedido</span></button></nav>
+  <div class="access-tools"><button id="text-size" type="button" aria-pressed="false">A+ Texto</button><button id="help-open" type="button">Cómo usar</button></div>
+  <dialog id="help-dialog" aria-labelledby="help-title"><div class="cart-content"><h2 id="help-title">Bienvenido a El Comienzo</h2><p>1. Explora la carta y usa los filtros.</p><p>2. Abre los detalles para personalizar o ver el plato en 3D.</p><p>3. Agrega tus platos y consulta Mi pedido para conocer el total.</p><p>Es una simulación, no se realizan cobros.</p><button class="button" id="help-close" type="button">Entendido, explorar carta</button></div></dialog>
+  <script src="script.js?v=27"></script>
 </body>
 </html>

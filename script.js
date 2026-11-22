@@ -441,6 +441,10 @@
       const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
       const total = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
       cartCount.textContent = String(itemCount);
+      document.querySelector("#float-count").textContent=itemCount;
+      document.querySelector("#float-total").textContent=formatPrice(total);
+      document.querySelector("#floating-order").hidden=!itemCount;
+      document.querySelector("#cart-image").disabled=!itemCount;
       document.querySelector("#cart-open").setAttribute("aria-label", `Abrir pedido, ${itemCount} productos`);
       cartTotal.textContent = formatPrice(total);
       document.querySelector("#cart-clear").disabled = cart.length === 0;
@@ -497,6 +501,7 @@
       cartMessage.hidden = true;
       cartMessage.textContent = "";
       renderCart();
+      document.querySelector("#detail-cart").hidden=false; pulseCart();
       document.querySelector("#cart-feedback").textContent = `${activeDish.name}${variantName ? ` (${variantName})` : ""} se agregó a Mi pedido.`;
     }
 
@@ -505,11 +510,11 @@
       if (typeof dishModel.jumpCameraToGoal === "function") dishModel.jumpCameraToGoal();
     }
 
-    function loadActiveDishModel() {
+    function loadActiveDishModel(load = !document.querySelector("#dish-3d").hidden) {
       const modelAsset = currentDishModel();
       const hasModel = Boolean(modelAsset.model && modelAsset.usdz);
       document.querySelector(".dialog-view-switch").hidden = !hasModel;
-      if (hasModel) {
+      if (hasModel && load) {
         dishModel.setAttribute("src", modelAsset.model);
         dishModel.setAttribute("ios-src", modelAsset.usdz);
         resetModelCamera();
@@ -530,7 +535,7 @@
     function captureDish() {
       return { index: dishes.indexOf(activeDish), variant: selectedVariantIndex,
         ingredients: [...selectedIngredients], extras: [...selectedExtras], scroll: dialog.scrollTop,
-        view: document.querySelector("#dish-3d").hidden ? "photo" : "3d" };
+        tab: detailTab, view: document.querySelector("#dish-3d").hidden ? "photo" : "3d" };
     }
     document.querySelector("#dish-back").addEventListener("click", () => {
       const previous = dishHistory.pop();
@@ -551,7 +556,9 @@
       selectedVariantIndex = restore?.variant ?? 0;
       selectedIngredients = new Set(restore?.ingredients ?? currentDishIngredients());
       selectedExtras = new Set(restore?.extras ?? []);
-      const hasModel = loadActiveDishModel();
+      const hasModel = loadActiveDishModel(false);
+      setDetailTab(restore?.tab || "description");
+      document.querySelector("#detail-cart").hidden = true;
       document.querySelector("#dialog-title").textContent = activeDish.name;
       document.querySelector("#dialog-description").textContent = activeDish.description;
       document.querySelector("#dialog-img").src = activeDish.image;
@@ -593,6 +600,7 @@
         });
       }
       updateDishPreview();
+      setDetailTab(detailTab);
       modelStatus.hidden = true;
       setDialogView(hasModel && restore?.view === "3d" ? "3d" : "photo");
       dialog.classList.remove("is-closing");
@@ -624,6 +632,7 @@
 
     function setDialogView(view) {
       const show3d = view === "3d";
+      if(show3d) loadActiveDishModel(true);
       document.querySelector("#dialog-photo").hidden = show3d;
       document.querySelector("#dish-3d").hidden = !show3d;
       document.querySelectorAll("[data-dialog-view]").forEach((button) => {
@@ -643,6 +652,7 @@
         document.querySelector("#dialog-calories").textContent = currentDishVariant().calories;
         loadActiveDishModel();
         updateDishPreview();
+        setDetailTab(detailTab);
       } else if (input.matches("[data-ingredient-index]")) {
         const ingredient = currentDishIngredients()[Number(input.dataset.ingredientIndex)];
         if (input.checked) selectedIngredients.add(ingredient);
@@ -732,13 +742,18 @@
 
       const removeButton = event.target.closest("[data-cart-remove]");
       if (removeButton) {
-        cart.splice(Number(removeButton.dataset.cartRemove), 1);
+        const index = Number(removeButton.dataset.cartRemove);
+        if (!cart[index]) return;
+        rememberRemoval([cart[index]], false);
+        cart.splice(index, 1);
         cartMessage.hidden = true;
         cartMessage.textContent = "";
         renderCart();
       }
     });
     document.querySelector("#cart-clear").addEventListener("click", () => {
+      if (!cart.length) return;
+      rememberRemoval(cart, true);
       cart = [];
       cartMessage.hidden = true;
       cartMessage.textContent = "";
@@ -793,9 +808,13 @@
     function renderMenu(filter = "todos") {
       const normalize = value => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       const query = normalize(document.querySelector("#menu-search").value.trim());
-      const visibleDishes = dishes.filter(dish => (filter === "todos" || (filter === "favoritos" ? favorites.has(dish.name) : dish.category === filter)) && matchesPreferences(dish) && normalize([dish.name, dish.description, ...dish.ingredients].join(" ")).includes(query));
+      let visibleDishes = dishes.filter(dish => (filter === "todos" || (filter === "favoritos" ? favorites.has(dish.name) : dish.category === filter)) && matchesPreferences(dish) && normalize([dish.name, dish.description, ...dish.ingredients].join(" ")).includes(query));
+      const max = document.querySelector("#price-filter").value;
+      if(max!=="") visibleDishes=visibleDishes.filter(d=>d.priceValue<=Number(max));
+      const sort=document.querySelector("#price-sort").value;
+      if(sort!=="default") visibleDishes.sort((a,b)=>(a.priceValue-b.priceValue)*(sort==="asc"?1:-1));
       document.querySelector("#menu-results").textContent = `${visibleDishes.length} productos`;
-      if (!visibleDishes.length) { grid.innerHTML = '<p class="cart-empty">No encontramos platos con esa búsqueda.</p>'; return; }
+      if (!visibleDishes.length) { grid.innerHTML = '<p class="cart-empty">No encontramos platos con esa búsqueda. <button type="button" data-reset-empty>Quitar filtros</button></p>'; return; }
       grid.innerHTML = visibleDishes.map((dish, index) => {
         const dishIndex = dishes.indexOf(dish);
         return `
@@ -810,7 +829,7 @@
               <p class="dish-desc">${dish.description}</p>
               <div class="dish-meta">
                 <span class="calories"><strong>${dish.caloriesLabel || dish.calories} kcal est.</strong> · por porción</span>
-                <button class="details-button" type="button" data-details="${dishIndex}">Ver detalles +</button>
+                <button class="details-button" type="button" data-details="${dishIndex}">Ver detalles +</button><button type="button" class="quick-add" data-quick="${dishIndex}" aria-label="Agregar ${dish.name}">+ Agregar</button>
               </div>
             </div>
           </article>`;
@@ -827,6 +846,8 @@
     });
 
     grid.addEventListener("click", (event) => {
+      if(event.target.closest("[data-reset-empty]")){document.querySelector("#reset-filters").click();return;}
+      const quick=event.target.closest("[data-quick]");if(quick){quickAdd(Number(quick.dataset.quick));return;}
       const fav=event.target.closest("[data-favorite]"); if(fav){toggleFavorite(dishes[Number(fav.dataset.favorite)]);return;}
       const button = event.target.closest("[data-details]");
       if (!button) return;
@@ -897,9 +918,70 @@
     document.querySelector("#menu-search").addEventListener("input", () => renderMenu(activeMenuFilter));
     document.querySelector("#detail-favorite").addEventListener("click",()=>toggleFavorite(activeDish));
     ["#diet-filter","#calorie-filter","#allergen-filter"].forEach(id=>document.querySelector(id).addEventListener("change",()=>{renderMenu(activeMenuFilter);renderCart();}));
-    document.querySelector("#reset-filters").addEventListener("click",()=>{["#diet-filter","#calorie-filter","#allergen-filter"].forEach(id=>document.querySelector(id).value="all");document.querySelector("#menu-search").value="";activeMenuFilter="todos";renderMenuTabs();renderMenu();renderCart();});
+    document.querySelector("#reset-filters").addEventListener("click",()=>{["#diet-filter","#calorie-filter","#allergen-filter"].forEach(id=>document.querySelector(id).value="all");document.querySelector("#price-filter").value="";document.querySelector("#price-sort").value="default";document.querySelector("#menu-search").value="";activeMenuFilter="todos";renderMenuTabs();renderMenu();renderCart();});
     ["#dish-pairings","#cart-pairings"].forEach(id=>document.querySelector(id).addEventListener("click",e=>{const b=e.target.closest("[data-pairing]");if(!b)return;if(cartDialog.open){dishHistory.length=0;dishHistory.push({cart:true,scroll:cartDialog.scrollTop});cartDialog.close();}else if(dialog.open && activeDish){dishHistory.push(captureDish());}openDishDialog(Number(b.dataset.pairing));dialog.scrollTop=0;document.querySelector("#dish-back").focus({preventScroll:true});}));
-    renderMenuTabs();
-    renderCart();
-    renderMenu();
-    observeReveals();
+    let detailTab="description", undoSnapshot=null, undoTimer, noticeTimer, returnDish=null;
+    const $=id=>document.getElementById(id);
+    function setDetailTab(tab){detailTab=tab; for(const t of ["description","ingredients","nutrition"]){$("detail-"+t).hidden=t!==tab;document.querySelector(`[data-detail-tab="${t}"]`).setAttribute("aria-pressed",String(t===tab));} if(activeDish){const v=currentDishVariant();const m=activeDish.variants?variantsMacros[selectedVariantIndex]:macroEstimates[dishes.indexOf(activeDish)];$("detail-macros").textContent=`${v?.calories??activeDish.calories} kcal · ${m?`Proteínas ${m[0]} g · Carbohidratos ${m[1]} g · Grasas ${m[2]} g`:"Macronutrientes no disponibles"}`;}}
+    document.querySelectorAll("[data-detail-tab]").forEach(b=>b.onclick=()=>setDetailTab(b.dataset.detailTab));
+    function pulseCart(){cartCount.animate?.([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(1)"}],{duration:matchMedia("(prefers-reduced-motion: reduce)").matches?0:300});}
+    function quickAdd(i){const d=dishes[i];if(d.variants?.length){dishHistory.length=0;openDishDialog(i);setDetailTab("ingredients");return;}const ingredients=[...d.ingredients],key=JSON.stringify([d.name,"",[...ingredients].sort(),[]]);const existing=cart.find(x=>x.key===key);if(existing)existing.quantity=Math.min(99,existing.quantity+1);else cart.push({key,name:d.name,variant:"",ingredients,extras:[],unitPrice:d.priceValue,quantity:1});renderCart();pulseCart();$("quick-notice").textContent=d.name+" agregado a tu pedido";$("quick-notice").hidden=false;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$("quick-notice").hidden=true,3500);}
+    let restoreTimer;
+    function hideRestore(){
+      clearTimeout(restoreTimer);
+      $("restore-anchor").hidden=true;
+      $("restore-panel").classList.remove("is-running","is-leaving");
+    }
+    function showRestore(){
+      hideRestore();
+      const panel=$("restore-panel");
+      $("restore-anchor").hidden=false;
+      void panel.offsetWidth;
+      panel.classList.add("is-running");
+      restoreTimer=setTimeout(()=>{panel.classList.add("is-leaving");restoreTimer=setTimeout(hideRestore,180);},2820);
+    }
+    function hideUndo(){
+      clearTimeout(undoTimer);
+      undoSnapshot=null;
+      $("undo-panel").classList.add("is-leaving");
+      undoTimer=setTimeout(()=>{$("undo-anchor").hidden=true;},180);
+    }
+    function rememberRemoval(items, cleared){
+      hideRestore();
+      clearTimeout(undoTimer);
+      undoSnapshot=JSON.parse(JSON.stringify(items));
+      $("undo-message").textContent=cleared?"Pedido vaciado":"Producto eliminado";
+      const panel=$("undo-panel");
+      $("undo-anchor").hidden=false;
+      panel.classList.remove("is-leaving","is-running");
+      void panel.offsetWidth;
+      panel.classList.add("is-running");
+      undoTimer=setTimeout(hideUndo,6000);
+    }
+    $("undo-cart").onclick=()=>{
+      if(!undoSnapshot)return;
+      for(const item of undoSnapshot){
+        const existing=cart.find(entry=>entry.key===item.key);
+        if(existing)existing.quantity=Math.min(99,existing.quantity+item.quantity);
+        else cart.push(item);
+      }
+      clearTimeout(undoTimer);undoSnapshot=null;$("undo-anchor").hidden=true;
+      renderCart();
+      cartMessage.textContent="";cartMessage.hidden=true;
+      showRestore();
+      document.querySelector("[data-cart-close]").focus({preventScroll:true});
+    };
+    cartDialog.addEventListener("close",()=>{if(undoSnapshot)hideUndo();hideRestore();});
+    function openOrder(){if(!cartDialog.open)$("cart-open").click();}
+    $("floating-order").onclick=openOrder;$("dock-cart").onclick=openOrder;
+    $("detail-cart").onclick=()=>{returnDish=captureDish();openOrder();};
+    document.querySelector("[data-continue]").onclick=()=>closeCartDialog();
+    cartDialog.addEventListener("close",()=>{if(returnDish){const snapshot=returnDish;returnDish=null;if(dialog.open){setDetailTab(snapshot.tab);dialog.scrollTop=snapshot.scroll;}}});
+    $("dock-favorites").onclick=()=>{activeMenuFilter="favoritos";renderMenuTabs();renderMenu(activeMenuFilter);$("menu").scrollIntoView();};
+    ["price-filter","price-sort"].forEach(id=>$(id).addEventListener(id==="price-filter"?"input":"change",()=>renderMenu(activeMenuFilter)));
+    $("text-size").onclick=()=>{const large=document.documentElement.classList.toggle("large-text");$("text-size").setAttribute("aria-pressed",String(large));try{localStorage.setItem("ec-large",String(large));}catch{}};
+    try{if(localStorage.getItem("ec-large")==="true"){document.documentElement.classList.add("large-text");$("text-size").setAttribute("aria-pressed","true");}}catch{}
+    $("help-open").onclick=()=>$("help-dialog").showModal();$("help-close").onclick=()=>{$("help-dialog").close();};
+    try{if(!localStorage.getItem("ec-help-seen")){localStorage.setItem("ec-help-seen","1");$("help-dialog").showModal();}}catch{}
+    $("cart-image").onclick=()=>{if(!cart.length)return;const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");const lines=[];ctx.font="22px Arial";for(const paragraph of cartSummary().split("\n")){let line="";for(const w of paragraph.split(" ")){if(ctx.measureText(line+" "+w).width>650&&line){lines.push(line);line=w;}else line+=(line?" ":"")+w;}lines.push(line);}canvas.width=740;canvas.height=100+lines.length*32;ctx.fillStyle="#11110f";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.font="22px Arial";lines.forEach((l,i)=>{ctx.fillStyle=i===0?"#c5a46d":"#f1eee6";ctx.fillText(l,42,55+i*32);});canvas.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="El-Comienzo-seleccion.png";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});};
+    renderMenuTabs(); renderCart(); renderMenu(); observeReveals();

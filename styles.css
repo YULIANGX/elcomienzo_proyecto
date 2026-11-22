@@ -451,3 +451,24 @@
 #dish-dialog #dish-back .detail-icon{width:19px;height:19px;}
 @media (hover:hover){#dish-dialog .detail-toolbar .detail-round:hover{background:#22221df5;border-color:var(--gold);}}
 @media (prefers-reduced-motion:reduce){#dish-dialog .detail-icon{transition:none!important;}#dish-dialog #detail-favorite[aria-pressed=true]{animation:none!important;}}
+
+/* 2.9.2 — smooth mobile rendering: no permanent animation layers */
+#dish-dialog {scroll-behavior:auto; -webkit-overflow-scrolling:touch;}
+#dish-dialog[open]{animation:detail-rise .32s cubic-bezier(.2,.8,.2,1) backwards;}
+#dish-dialog.is-closing[open]{animation:detail-fall .18s ease-in both;}
+@media (max-width:760px), (pointer:coarse) {
+  dialog::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(0,0,0,.83);}
+  #dish-dialog .detail-round{backdrop-filter:none;-webkit-backdrop-filter:none;background:#11110fec;}
+  .dish-badge{backdrop-filter:none;-webkit-backdrop-filter:none;}
+  #dish-dialog{box-shadow:0 8px 28px #0006;}
+  #dish-dialog .detail-order{background:#191916;box-shadow:0 -4px 12px #0003;}
+  #dish-dialog .detail-toolbar{touch-action:pan-y;}
+  .dish-card{transform-style:flat;}
+  .dish-card:hover{box-shadow:none;}
+  .dish-card:hover .dish-photo img{transform:none;}
+  .dish-card.reveal{transition:opacity .24s ease,transform .24s ease;transition-delay:0ms!important;}
+  .dish-card.reveal.is-visible{transform:none;}
+  .dish-card .favorite-button[aria-pressed=true]{animation:none;}
+  #dish-pairings{overscroll-behavior-x:contain;}
+}
+@media(prefers-reduced-motion:reduce){#dish-dialog[open],#dish-dialog.is-closing[open]{animation:none!important;}}

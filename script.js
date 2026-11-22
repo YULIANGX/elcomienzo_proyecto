@@ -321,7 +321,7 @@
     function renderNutrition(){const n=nutritionTotals(cart);document.querySelector("#cart-nutrition").innerHTML=[["Energía",n.kcal+" kcal"],["Proteínas",n.macros[0]+" g"],["Carbohidratos",n.macros[1]+" g"],["Grasas",n.macros[2]+" g"]].map(([a,b])=>`<div><small>${a}</small><strong>${b}</strong></div>`).join("");document.querySelector("#nutrition-warning").textContent=[n.unknown?`Macros parciales: ${n.unknown} porción(es) sin estimación disponible (bebidas fermentadas).`:"",n.custom?"Tu selección contiene personalizaciones que no se reflejan en este cálculo.":""].filter(Boolean).join(" ");}
     const pairingRules = {sea:[38,54,50,47],meat:[35,34,50,31],veg:[6,55,15,48],sweet:[11,51,19],drink:[35,27,31]};
     function pairings(anchor,excluded=[]){const text=anchor?declared(anchor):"";const key=!anchor?"meat":anchor.category==="postres"?"sweet":anchor.category==="bebidas"?"drink":patterns.fish.test(text)||patterns.shell.test(text)?"sea":animal.test(text)?"meat":"veg";const used=new Set(excluded.map(d=>d.name)); if(anchor)used.add(anchor.name);const categories=anchor?.category==="postres"?["bebidas"]:anchor?.category==="bebidas"?["entradas","principales","postres"]:["entradas","acompanamientos","bebidas","postres"];const all=[...pairingRules[key].map(i=>dishes[i]),...dishes];return categories.filter(cat=>cat!==anchor?.category&&!excluded.some(d=>d.category===cat)).map(cat=>all.find(d=>d.category===cat&&!used.has(d.name)&&matchesPreferences(d))).filter(Boolean).slice(0,3);}
-    function renderPairings(target,anchor,excluded=[]){const list=pairings(anchor,excluded);document.querySelector(target).innerHTML=list.length?list.map(d=>`<button type="button" class="pairing-item" data-pairing="${dishes.indexOf(d)}"><img src="${d.image}" alt="" loading="lazy"><span>${d.name}<small>${formatPrice(d.priceValue)} · ${d.category}</small></span><span aria-hidden="true">→</span></button>`).join(""):'<p class="smart-note">No hay sugerencias adicionales con tus filtros actuales.</p>';}
+    function renderPairings(target,anchor,excluded=[]){const list=pairings(anchor,excluded);document.querySelector(target).innerHTML=list.length?list.map(d=>`<button type="button" class="pairing-item" data-pairing="${dishes.indexOf(d)}"><img src="${d.image}" alt="" loading="lazy" decoding="async"><span>${d.name}<small>${formatPrice(d.priceValue)} · ${d.category}</small></span><span aria-hidden="true">→</span></button>`).join(""):'<p class="smart-note">No hay sugerencias adicionales con tus filtros actuales.</p>';}
 
     function loadCart() {
       try {
@@ -371,8 +371,9 @@
       return icons.find(([keyword]) => ingredient.includes(keyword))?.[1] || "✦";
     }
 
+    const priceFormatter = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
     function formatPrice(amount) {
-      return new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(amount);
+      return priceFormatter.format(amount);
     }
 
     function currentDishVariant() {
@@ -458,7 +459,7 @@
       cartItems.innerHTML = cart.length ? cart.map((item, index) => `
         <article class="cart-item">
           <div class="cart-item-heading">
-            <img class="cart-thumb" src="${dishes.find(d => d.name === item.name)?.image || ""}" alt="" loading="lazy">
+            <img class="cart-thumb" src="${dishes.find(d => d.name === item.name)?.image || ""}" alt="" loading="lazy" decoding="async">
             <h3>${item.name}</h3>
             <button class="cart-remove" type="button" data-cart-remove="${index}" aria-label="Quitar ${item.name} del pedido">Quitar</button>
           </div>
@@ -562,7 +563,7 @@
       selectedIngredients = new Set(restore?.ingredients ?? currentDishIngredients());
       selectedExtras = new Set(restore?.extras ?? []);
       const hasModel = loadActiveDishModel(false);
-      setDetailTab(restore?.tab || "description");
+      detailTab = restore?.tab || "description";
       document.querySelector("#detail-cart").hidden = true;
       document.querySelector("#dialog-title").textContent = activeDish.name;
       document.querySelector("#dialog-description").textContent = activeDish.description;
@@ -638,6 +639,7 @@
     function setDialogView(view) {
       const show3d = view === "3d";
       if(show3d) loadActiveDishModel(true);
+      else { dishModel.removeAttribute("src"); dishModel.removeAttribute("ios-src"); }
       document.querySelector("#dialog-photo").hidden = show3d;
       document.querySelector("#dish-3d").hidden = !show3d;
       document.querySelectorAll("[data-dialog-view]").forEach((button) => {
@@ -699,7 +701,7 @@
       if (event.target === dialog) { const r=dialog.getBoundingClientRect(); if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom) closeDishDialog(); }
     });
     dialog.addEventListener("close", () => {
-      if (!dialog.open) { dishHistory.length = 0; updateDishHistory(); }
+      if (!dialog.open) { dishHistory.length = 0; updateDishHistory(); dishModel.removeAttribute("src"); dishModel.removeAttribute("ios-src"); }
       window.clearTimeout(dialogCloseTimer);
       dialog.classList.remove("is-closing");
     });
@@ -819,13 +821,14 @@
       const sort=document.querySelector("#price-sort").value;
       if(sort!=="default") visibleDishes.sort((a,b)=>(a.priceValue-b.priceValue)*(sort==="asc"?1:-1));
       document.querySelector("#menu-results").textContent = `${visibleDishes.length} productos`;
-      if (!visibleDishes.length) { grid.innerHTML = '<p class="cart-empty">No encontramos platos con esa búsqueda. <button type="button" data-reset-empty>Quitar filtros</button></p>'; return; }
+      if (!visibleDishes.length) { if (revealObserver) grid.querySelectorAll(".reveal").forEach(el => revealObserver.unobserve(el)); grid.innerHTML = '<p class="cart-empty">No encontramos platos con esa búsqueda. <button type="button" data-reset-empty>Quitar filtros</button></p>'; return; }
+      if (revealObserver) grid.querySelectorAll(".reveal").forEach(el => revealObserver.unobserve(el));
       grid.innerHTML = visibleDishes.map((dish, index) => {
         const dishIndex = dishes.indexOf(dish);
         return `
           <article class="dish-card reveal" data-dish-index="${dishIndex}" style="transition-delay:${Math.min(index, 6) * 70}ms">
             <div class="dish-photo">
-              <img src="${dish.image}" alt="${dish.alt}" loading="lazy">
+              <img src="${dish.image}" alt="${dish.alt}" loading="lazy" decoding="async">
               ${dish.imageCredit ? `<a class="photo-credit" href="${dish.imageCredit.source}" target="_blank" rel="noopener noreferrer">Foto: ${dish.imageCredit.author} · ${dish.imageCredit.license}</a>` : ""}
               <span class="dish-badge">${dish.label}</span><button class="favorite-button" type="button" data-favorite="${dishIndex}" aria-label="Favorito: ${dish.name}" aria-pressed="${favorites.has(dish.name)}">${favorites.has(dish.name)?"♥":"♡"}</button>
             </div>
@@ -862,7 +865,7 @@
 
     grid.addEventListener("pointermove", (event) => {
       const card = event.target.closest(".dish-card");
-      if (!card || event.pointerType !== "mouse") return;
+      if (!card || event.pointerType !== "mouse" || !matchMedia("(hover:hover) and (pointer:fine)").matches) return;
       const bounds = card.getBoundingClientRect();
       const x = (event.clientX - bounds.left) / bounds.width;
       const y = (event.clientY - bounds.top) / bounds.height;

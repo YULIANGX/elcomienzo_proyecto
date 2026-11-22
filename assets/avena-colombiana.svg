@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" role="img" aria-labelledby="title description">
+  <title id="title">Avena colombiana</title>
+  <desc id="description">Vaso de avena fría y cremosa, acompañada de hojuelas de avena y canela.</desc>
+  <defs>
+    <radialGradient id="backdrop" cx="50%" cy="38%" r="72%">
+      <stop offset="0" stop-color="#3b3428"/>
+      <stop offset="1" stop-color="#191815"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="0" x2="1">
+      <stop stop-color="#fff" stop-opacity=".42"/>
+      <stop offset=".18" stop-color="#fff" stop-opacity=".1"/>
+      <stop offset=".82" stop-color="#f8ead0" stop-opacity=".06"/>
+      <stop offset="1" stop-color="#fff" stop-opacity=".34"/>
+    </linearGradient>
+    <linearGradient id="drink" x1="0" y1="0" x2=".8" y2="1">
+      <stop stop-color="#e4d0a8"/>
+      <stop offset=".53" stop-color="#c9ad7c"/>
+      <stop offset="1" stop-color="#9f8053"/>
+    </linearGradient>
+    <linearGradient id="cinnamon" x1="0" x2="1">
+      <stop stop-color="#b36f36"/>
+      <stop offset=".5" stop-color="#754321"/>
+      <stop offset="1" stop-color="#c38449"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect width="900" height="600" fill="url(#backdrop)"/>
+  <circle cx="455" cy="278" r="223" fill="#dfc18d" opacity=".07"/>
+  <ellipse cx="450" cy="513" rx="159" ry="24" fill="#000" opacity=".6" filter="url(#shadow)"/>
+  <path d="M356 196h188l-20 270q-2 25-27 25h-94q-25 0-27-25z" fill="url(#drink)"/>
+  <g fill="#f2e7cd" opacity=".83">
+    <path d="M374 260q21-14 40 1t-2 18q-20 11-38-3t0-16z"/>
+    <path d="M468 300q21-13 38 3t-3 16q-19 10-36-3t1-16z"/>
+    <path d="M400 355q22-15 39 1t-3 17q-20 11-38-2t2-16z"/>
+    <path d="M480 410q18-12 33 2t-2 15q-16 9-31-2t0-15z"/>
+    <path d="M375 433q14-10 27 1t-2 12q-13 7-25-2t0-11z"/>
+  </g>
+  <path d="M348 187q102-18 204 0l-5 18q-97 17-194 0z" fill="#f4ead7" fill-opacity=".72" stroke="#fff4e2" stroke-opacity=".85" stroke-width="4"/>
+  <path d="M357 205h186l-19 260q-2 25-27 25h-94q-25 0-27-25z" fill="url(#glass)" stroke="#e6d7bd" stroke-opacity=".75" stroke-width="4"/>
+  <path d="M375 225q17 7 17 26v186" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="7" stroke-linecap="round"/>
+  <path d="M526 225q-10 38-11 73" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="450" cy="208" rx="92" ry="15" fill="#e9d8b8"/>
+  <path d="M415 207q36-16 70 0" fill="none" stroke="#9e7042" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+  <g transform="translate(588 424) rotate(-17)">
+    <rect x="-47" y="-8" width="100" height="20" rx="10" fill="url(#cinnamon)"/>
+    <path d="M-39-5h82M-38 0h80M-36 6h78" stroke="#e0a267" stroke-width="2" opacity=".62"/>
+  </g>
+  <g transform="translate(610 355) rotate(24)">
+    <rect x="-42" y="-7" width="92" height="17" rx="8.5" fill="#c89150"/>
+    <path d="M-32-3h68M-31 2h66" stroke="#f1ca8c" stroke-width="2" opacity=".68"/>
+  </g>
+  <g fill="#d8c08f">
+    <ellipse cx="254" cy="460" rx="18" ry="7" transform="rotate(-27 254 460)"/>
+    <ellipse cx="290" cy="480" rx="17" ry="7" transform="rotate(18 290 480)"/>
+    <ellipse cx="321" cy="453" rx="16" ry="7" transform="rotate(-9 321 453)"/>
+    <ellipse cx="277" cy="430" rx="14" ry="6" transform="rotate(36 277 430)"/>
+  </g>
+</svg>

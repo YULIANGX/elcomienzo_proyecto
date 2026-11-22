@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" role="img" aria-labelledby="title description">
+  <title id="title">Arepa rellena de plátano maduro</title>
+  <desc id="description">Arepa dorada de plátano maduro con carne desmechada, hogao y quesos fundidos.</desc>
+  <defs>
+    <radialGradient id="backdrop" cx="50%" cy="40%" r="72%">
+      <stop offset="0" stop-color="#453426"/>
+      <stop offset="1" stop-color="#191715"/>
+    </radialGradient>
+    <radialGradient id="plate" cx="45%" cy="40%" r="65%">
+      <stop stop-color="#f2ece0"/>
+      <stop offset=".76" stop-color="#d8d0c0"/>
+      <stop offset="1" stop-color="#aaa08f"/>
+    </radialGradient>
+    <linearGradient id="plantain" x1="0" y1="0" x2=".8" y2="1">
+      <stop stop-color="#f4c968"/>
+      <stop offset=".5" stop-color="#d99335"/>
+      <stop offset="1" stop-color="#9f5720"/>
+    </linearGradient>
+    <linearGradient id="filling" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#6e3018"/>
+      <stop offset="1" stop-color="#3d1a11"/>
+    </linearGradient>
+    <linearGradient id="cheese" x1="0" x2="1">
+      <stop stop-color="#fff5d8"/>
+      <stop offset=".55" stop-color="#e7d09b"/>
+      <stop offset="1" stop-color="#b98948"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feGaussianBlur stdDeviation="17"/>
+    </filter>
+  </defs>
+  <rect width="900" height="600" fill="url(#backdrop)"/>
+  <circle cx="452" cy="286" r="220" fill="#d89e4a" opacity=".07"/>
+  <ellipse cx="451" cy="481" rx="232" ry="37" fill="#000" opacity=".62" filter="url(#shadow)"/>
+  <ellipse cx="450" cy="347" rx="220" ry="139" fill="#88704c"/>
+  <ellipse cx="450" cy="333" rx="216" ry="136" fill="url(#plate)" stroke="#d4b77a" stroke-width="5"/>
+  <ellipse cx="450" cy="329" rx="190" ry="111" fill="#ded6c6"/>
+  <ellipse cx="452" cy="329" rx="154" ry="91" fill="url(#plantain)" transform="rotate(-8 452 329)"/>
+  <ellipse cx="451" cy="319" rx="137" ry="70" fill="#e1a546" transform="rotate(-8 451 319)"/>
+  <path d="M337 333q46-52 111-30 47 16 114 4 38-7 63 18-21 49-80 54-66 6-111-4-65-15-97-42z" fill="url(#filling)"/>
+  <g fill="#a84f26">
+    <path d="M356 326q30-20 62-10l-18 17-44 4z"/>
+    <path d="M431 329q33-27 68-14l-25 20-40 5z"/>
+    <path d="M500 324q32-21 61-7l-21 20-44 2z"/>
+    <path d="M385 350q28-19 57-9l-19 17-42 2z"/>
+    <path d="M466 350q31-21 62-8l-24 19-40 2z"/>
+  </g>
+  <path d="M345 309q43-28 91-14 40 13 81 0 39-12 69 7-6 15-24 21-40-18-75-3-45 18-88 3-31-11-54 4z" fill="url(#cheese)"/>
+  <path d="M371 297q21-24 42-7l9 23-22 8-8 22-18-5 5-22zM466 292q26-18 47 3l-5 20-24 7-14-11z" fill="#f3e8cc"/>
+  <path d="M357 367q36 28 87 25m52 3q42 3 71-17" fill="none" stroke="#f4cf77" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+  <g fill="#65904b">
+    <ellipse cx="602" cy="258" rx="17" ry="7" transform="rotate(-32 602 258)"/>
+    <ellipse cx="620" cy="270" rx="15" ry="6" transform="rotate(26 620 270)"/>
+    <ellipse cx="592" cy="277" rx="13" ry="5" transform="rotate(-55 592 277)"/>
+  </g>
+  <path d="M285 419q44 20 89 9" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>
+</svg>

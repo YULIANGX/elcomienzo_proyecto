@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="El comienzo: cocina colombiana de autor, ingredientes de temporada y una experiencia íntima en Armenia, Quindío, Colombia.">
+  <title>El comienzo — Cocina colombiana de autor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script id="model-viewer-library" type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="El comienzo, inicio">
+      <img class="brand-logo" src="assets/logo-el-comienzo-header.png" alt="" width="1165" height="400">
+    </a>
+    <button class="menu-toggle" type="button" aria-label="Abrir menú de navegación" aria-expanded="false">☰</button>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="#filosofia">Filosofía</a>
+      <a href="#menu">Menú</a>
+      <a href="#visitanos">Visítanos</a>
+      <a class="button" href="#reservas">Reservar mesa <span aria-hidden="true">↗</span></a>
+    </nav>
+    <button class="cart-button" id="cart-open" type="button" aria-haspopup="dialog" aria-controls="cart-dialog" aria-label="Abrir pedido, 0 productos">
+      Mi pedido <span class="cart-count" id="cart-count" aria-live="polite">0</span>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-content">
+        <div class="eyebrow">Una mesa. Un momento. Un recuerdo.</div>
+        <h1 class="serif">El sabor<br>de lo <em>esencial.</em></h1>
+        <p class="hero-copy">Cocina honesta, producto extraordinario y el placer de quedarse un poco más. Bienvenidos a El comienzo.</p>
+        <div class="hero-actions">
+          <a class="button" href="#menu">Descubrir el menú <span aria-hidden="true">→</span></a>
+          <div class="hero-note"><span>✦</span> Ingredientes de temporada</div>
+        </div>
+      </div>
+      <div class="hero-index">ARMENIA · QUINDÍO, COLOMBIA</div>
+      <a class="scroll-cue" href="#filosofia">Desliza para descubrir</a>
+    </section>
+
+    <section class="intro" id="filosofia">
+      <div class="intro-visual reveal">
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85" alt="Interior cálido e íntimo de un restaurante">
+        <span class="image-caption">Un lugar para volver</span>
+      </div>
+      <div class="intro-copy reveal">
+        <div class="eyebrow">Nuestra filosofía</div>
+        <h2 class="serif">La belleza está<br>en <em>lo simple.</em></h2>
+        <p>Creemos en el origen, en el tiempo y en las manos que hacen posible cada plato. Por eso cocinamos con productores cercanos y elegimos cada ingrediente con intención.</p>
+        <p>Una cocina contemporánea que honra sus raíces, en un espacio pensado para compartir sin apuro.</p>
+        <a class="text-link" href="#visitanos">Conoce nuestra casa <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <section class="menu-section" id="menu">
+      <div class="section-heading reveal">
+        <div class="eyebrow">Hecho con intención</div>
+        <h2 class="serif">Una carta para <em>disfrutar.</em></h2>
+        <p>Platos de temporada, sabores que sorprenden y el mejor producto en su momento. Explora la carta y descubre cada detalle.</p>
+      </div>
+      <div class="menu-tabs" role="group" aria-label="Filtrar platos por categoría"></div>
+      <div class="menu-grid" id="menu-grid" aria-live="polite"></div>
+      <p class="menu-hint">Mueve el cursor sobre un plato para explorar · Selecciona «Ver detalles» para conocer sus ingredientes · Precios de referencia en COP</p>
+    </section>
+
+    <section class="quote-band">
+      <div class="quote-mark" aria-hidden="true">“</div>
+      <blockquote>“Comer es un acto de amor. Cocinar, una forma de compartirlo.”</blockquote>
+      <div class="quote-credit">La cocina de El comienzo</div>
+    </section>
+
+    <section class="reservation" id="visitanos">
+      <div class="reservation-copy reveal">
+        <div class="eyebrow">Te esperamos</div>
+        <h2 class="serif">Tu próxima<br>gran noche <em>empieza aquí.</em></h2>
+        <p>Una cena especial, una celebración o simplemente las ganas de comer bien. Reserva tu mesa y nosotros nos ocupamos del resto.</p>
+        <div class="reservation-details">
+          <div><strong>Encuéntranos</strong><span>Armenia, Quindío<br>Colombia</span></div>
+          <div><strong>Horario</strong><span>Mar — Dom<br>19:00 — 00:00</span></div>
+        </div>
+      </div>
+      <form class="booking-form reveal" id="reservas">
+        <div><label for="guest-name">Tu nombre</label><input id="guest-name" name="name" autocomplete="name" placeholder="Nombre y apellido" required></div>
+        <div><label for="guest-phone">Teléfono</label><input id="guest-phone" name="phone" type="tel" autocomplete="tel" placeholder="+57 300 000 0000" required></div>
+        <div><label for="booking-date">Fecha</label><input id="booking-date" name="date" type="date" required></div>
+        <div><label for="booking-guests">Personas</label><select id="booking-guests" name="guests"><option>2 personas</option><option>1 persona</option><option>3 personas</option><option>4 personas</option><option>5 o más</option></select></div>
+        <div class="full"><button class="button" type="submit">Solicitar reserva <span aria-hidden="true">→</span></button></div>
+        <p class="form-message" id="form-message" role="status"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand" href="#inicio" aria-label="El comienzo, inicio">
+      <img class="brand-logo" src="assets/logo-el-comienzo.png" alt="" width="1165" height="540">
+    </a>
+    <span class="footer-center">Armenia, Quindío · Colombia</span>
+    <a class="social-link" href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram ↗</a>
+    <span>© <span id="current-year"></span> El comienzo. Todos los derechos reservados.</span>
+  </footer>
+
+  <dialog id="dish-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-view-switch" role="group" aria-label="Modo de visualización">
+      <button class="view-button" type="button" data-dialog-view="photo" aria-pressed="true">Foto</button>
+      <button class="view-button" type="button" data-dialog-view="3d" aria-pressed="false">Vista 3D</button>
+    </div>
+    <div class="dialog-image" id="dialog-photo">
+      <img id="dialog-img" src="" alt="">
+      <a class="photo-credit dialog-photo-credit" id="dialog-image-credit" target="_blank" rel="noopener noreferrer" hidden></a>
+    </div>
+    <div class="dish-3d" id="dish-3d" hidden>
+      <model-viewer id="dish-model" class="dish-model" camera-controls ar
+        ar-modes="webxr scene-viewer quick-look" interaction-prompt="auto"
+        camera-orbit="0deg 65deg 0.9m" min-camera-orbit="auto 20deg 0.4m"
+        max-camera-orbit="auto 90deg 1.8m" shadow-intensity="1.25" shadow-softness="0.8"
+        environment-image="neutral" exposure="1.08" alt="">
+        <button class="model-ar-button" slot="ar-button" type="button">Ver en tu mesa · AR</button>
+        <span class="model-loading" slot="progress-bar"></span>
+      </model-viewer>
+      <p class="scene-hint" id="model-status" role="status" hidden></p>
+      <div class="ingredient-model" id="ingredient-model" aria-live="polite"></div>
+      <div class="scene-controls">
+        <button type="button" data-model-reset>Restablecer vista</button>
+      </div>
+      <p class="scene-hint">Arrastra para girar · usa la rueda o pellizca para acercar · en móviles compatibles, prueba AR</p>
+    </div>
+    <div class="dialog-content">
+      <div class="dialog-top"><h2 id="dialog-title"></h2><button class="dialog-close" type="button" aria-label="Cerrar detalles">×</button></div>
+      <p id="dialog-description"></p>
+      <div class="variant-selector" id="dialog-variants" hidden>
+        <span class="dialog-label" id="dialog-variant-label">Elige una preparación</span>
+        <div class="customization-list" id="dialog-variant-options" role="radiogroup" aria-labelledby="dialog-variant-label"></div>
+      </div>
+      <span class="dialog-label">Ingredientes incluidos <small>Desmarca para quitar</small></span>
+      <div class="customization-list" id="dialog-ingredients"></div>
+      <span class="dialog-label">Añade un extra</span>
+      <div class="customization-list" id="dialog-extras"></div>
+      <div class="dialog-nutrition">
+        <span><strong id="dialog-calories"></strong> kcal base estimadas</span>
+        <span>Total estimado <strong id="dialog-price"></strong></span>
+      </div>
+      <button class="button add-to-cart" id="add-to-cart" type="button">Agregar al pedido</button>
+      <p class="cart-feedback" id="cart-feedback" role="status" aria-live="polite"></p>
+      <p class="customization-note" id="customization-note"></p>
+    </div>
+  </dialog>
+
+  <dialog id="cart-dialog" aria-labelledby="cart-title">
+    <div class="cart-content">
+      <div class="dialog-top">
+        <h2 id="cart-title">Mi pedido</h2>
+        <button class="dialog-close" type="button" data-cart-close aria-label="Cerrar pedido">×</button>
+      </div>
+      <div class="cart-items" id="cart-items" aria-live="polite"></div>
+      <div class="cart-total"><span>Total estimado</span><strong id="cart-total"></strong></div>
+      <p class="cart-message" id="cart-message" role="status" hidden></p>
+      <div class="cart-actions">
+        <button class="cart-secondary" id="cart-clear" type="button" disabled>Vaciar</button>
+        <button class="button" id="cart-confirm" type="button" disabled>Confirmar pedido</button>
+      </div>
+      <p class="cart-note">Demostración: el pedido no se envía a cocina ni realiza un pago.</p>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>

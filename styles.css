@@ -472,3 +472,6 @@
   #dish-pairings{overscroll-behavior-x:contain;}
 }
 @media(prefers-reduced-motion:reduce){#dish-dialog[open],#dish-dialog.is-closing[open]{animation:none!important;}}
+
+/* AR: instrucciones legibles sin efectos pesados */
+.ar-placement-help{max-width:48rem;margin:.5rem auto 0;line-height:1.5;opacity:.85;font-size:.85rem}

@@ -129,7 +129,7 @@
     </div>
     <div class="dish-3d" id="dish-3d" hidden>
       <model-viewer id="dish-model" class="dish-model" camera-controls ar
-        ar-modes="webxr scene-viewer quick-look" interaction-prompt="auto"
+        ar-modes="scene-viewer quick-look webxr" ar-placement="floor" ar-scale="fixed" interaction-prompt="auto"
         camera-orbit="0deg 65deg 0.9m" min-camera-orbit="auto 20deg 0.4m"
         max-camera-orbit="auto 90deg 1.8m" shadow-intensity="1.25" shadow-softness="0.8"
         environment-image="neutral" exposure="1.08" alt="">
@@ -142,6 +142,7 @@
         <button type="button" data-model-reset>Restablecer vista</button>
       </div>
       <p class="scene-hint">Arrastra para girar · usa la rueda o pellizca para acercar · en móviles compatibles, prueba AR</p>
+      <p class="scene-hint ar-placement-help">Para colocar el plato: apunta a una mesa bien iluminada, mueve el celular lentamente hasta detectar la superficie y toca para fijarlo. Si se desplaza, vuelve a colocarlo.</p>
     </div>
     </div>
     <div class="dialog-content">

@@ -475,3 +475,30 @@
 
 /* AR: instrucciones legibles sin efectos pesados */
 .ar-placement-help{max-width:48rem;margin:.5rem auto 0;line-height:1.5;opacity:.85;font-size:.85rem}
+
+/* 2.9.5 — final presentation polish; keeps all previous features */
+.order-review{margin:14px 0;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel-light);color:var(--cream)}
+.order-review summary{cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;list-style:none}
+.order-review summary::-webkit-details-marker{display:none}
+.order-review[open] summary{color:var(--gold)}
+.order-review-content{padding:10px 0 4px;overflow-wrap:anywhere;font-size:.88rem;line-height:1.55}
+.order-review-content ul{padding-left:18px;margin:0 0 12px}
+.order-review-content li+li{margin-top:8px}
+.order-review-content strong{color:var(--gold)}
+#dish-dialog .detail-round:focus-visible,#dish-dialog .view-button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+#dish-dialog .detail-tabs button{line-height:1.35;overflow-wrap:anywhere}
+#dish-dialog .detail-key-ingredients>div{line-height:1.35}
+#dish-dialog .detail-order .button{font-weight:700}
+@media(max-width:760px){
+  /* Animating opacity instead of translating a long scrolling dialog avoids extra compositing during opening. */
+  #dish-dialog[open]{animation:ec-mobile-open .2s ease-out backwards}
+  #dish-dialog.is-closing[open]{animation:ec-mobile-close .15s ease-in both}
+  #dish-dialog .detail-order{box-shadow:none;border-top:1px solid #c5a46d44}
+  #dish-dialog .detail-key-ingredients{gap:6px}
+  #dish-dialog .detail-key-ingredients>div{padding:10px 5px;min-height:78px}
+  #dish-dialog .dialog-image img{image-rendering:auto}
+  .dish-card .dish-photo img{content-visibility:auto}
+}
+@keyframes ec-mobile-open{from{opacity:0}to{opacity:1}}
+@keyframes ec-mobile-close{to{opacity:0}}
+@media(prefers-reduced-motion:reduce){#dish-dialog[open],#dish-dialog.is-closing[open]{animation:none!important}}

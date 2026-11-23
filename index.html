@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=27">
+  <link rel="stylesheet" href="styles.css?v=30">
   <script id="model-viewer-library" type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 </head>
 <body>
@@ -124,7 +124,7 @@
       <button class="view-button" type="button" data-dialog-view="3d" aria-pressed="false">Vista 3D</button>
     </div>
     <div class="dialog-image" id="dialog-photo">
-      <img id="dialog-img" decoding="async" alt="">
+      <img id="dialog-img" decoding="async" fetchpriority="high" alt="">
       <a class="photo-credit dialog-photo-credit" id="dialog-image-credit" target="_blank" rel="noopener noreferrer" hidden></a>
     </div>
     <div class="dish-3d" id="dish-3d" hidden>
@@ -187,12 +187,13 @@
       </div>
       <div class="cart-items" id="cart-items" aria-live="polite"></div>
       <div class="cart-total"><span>Total estimado</span><strong id="cart-total"></strong></div>
+      <details class="order-review" id="order-review"><summary>Revisar selección antes de copiar <span aria-hidden="true">⌄</span></summary><div id="order-review-content" class="order-review-content"></div><p class="smart-note">Prototipo académico: no se envía a cocina ni procesa pagos.</p></details>
       <section class="smart-panel" aria-label="Nutrición del pedido"><h3>Aporte nutricional estimado</h3><div id="cart-nutrition" class="nutrition-grid" aria-live="polite"></div><p class="smart-note">Calorías de la carta y macronutrientes orientativos de recetas base, multiplicados por cantidad. No incluyen ajustes por extras o ingredientes retirados; no son datos de laboratorio.</p><p id="nutrition-warning" class="smart-note"></p></section><section class="smart-panel"><h3>Completa tu experiencia</h3><div id="cart-pairings" class="pairing-list"></div></section><p class="cart-message" id="cart-message" role="status" hidden></p>
       <div class="cart-actions"><button class="cart-secondary" id="cart-image" type="button">Descargar resumen PNG</button><button class="cart-secondary" type="button" data-continue>Seguir explorando</button>
         <button class="cart-secondary" id="cart-clear" type="button" disabled>Vaciar</button>
         <button class="button" id="cart-confirm" type="button" disabled>Copiar selección</button>
       </div>
-      <p class="cart-note">Selección guardada en este navegador. No se envía a cocina ni genera cobros.</p>
+      <p class="cart-note">Selección guardada únicamente en este navegador. No se envía a cocina ni genera cobros. Los alérgenos y valores nutricionales son orientativos: confirma los ingredientes con el establecimiento.</p>
     </div>
   </dialog>
 
@@ -201,6 +202,6 @@
   <nav class="mobile-dock" aria-label="Accesos rápidos"><a href="#inicio">⌂<span>Inicio</span></a><a href="#menu">☰<span>Menú</span></a><button id="dock-favorites" type="button">♡<span>Favoritos</span></button><button id="dock-cart" type="button">▣<span>Mi pedido</span></button></nav>
   <div class="access-tools"><button id="text-size" type="button" aria-pressed="false">A+ Texto</button><button id="help-open" type="button">Cómo usar</button></div>
   <dialog id="help-dialog" aria-labelledby="help-title"><div class="cart-content"><h2 id="help-title">Bienvenido a El Comienzo</h2><p>1. Explora la carta y usa los filtros.</p><p>2. Abre los detalles para personalizar o ver el plato en 3D.</p><p>3. Agrega tus platos y consulta Mi pedido para conocer el total.</p><p>Es una simulación, no se realizan cobros.</p><button class="button" id="help-close" type="button">Entendido, explorar carta</button></div></dialog>
-  <script src="script.js?v=27"></script>
+  <script src="script.js?v=30"></script>
 </body>
 </html>

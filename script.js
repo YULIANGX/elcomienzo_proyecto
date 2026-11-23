@@ -456,6 +456,21 @@
       document.querySelector("#cart-clear").disabled = cart.length === 0;
       document.querySelector("#cart-confirm").disabled = cart.length === 0;
 
+      // Vista previa accesible, siempre sincronizada con la selección actual.
+      const review = document.querySelector("#order-review-content");
+      if (review) {
+        review.replaceChildren();
+        const list = document.createElement("ul");
+        for (const item of cart) {
+          const li = document.createElement("li");
+          const extras = item.extras?.length ? ` · Extras: ${item.extras.join(", ")}` : "";
+          const variant = item.variant ? ` · ${item.variant}` : "";
+          li.textContent = `${item.quantity} × ${item.name}${variant}${extras} — ${formatPrice(item.unitPrice * item.quantity)}`;
+          list.append(li);
+        }
+        if (!cart.length) { const p = document.createElement("p"); p.textContent = "Agrega un plato para revisar tu selección."; review.append(p); }
+        else { review.append(list); const totalLine = document.createElement("strong"); totalLine.textContent = `Total estimado: ${formatPrice(total)}`; review.append(totalLine); }
+      }
       cartItems.innerHTML = cart.length ? cart.map((item, index) => `
         <article class="cart-item">
           <div class="cart-item-heading">
@@ -568,6 +583,7 @@
       document.querySelector("#dialog-title").textContent = activeDish.name;
       document.querySelector("#dialog-description").textContent = activeDish.description;
       document.querySelector("#dialog-img").src = activeDish.image;
+      document.querySelector("#dialog-img").decode?.().catch(() => {});
       document.querySelector("#dialog-img").alt = activeDish.alt;
       document.querySelector('[data-dialog-view="photo"]').textContent = activeDish.imageType === "illustration" ? "Ilustración" : "Foto";
       const imageCredit = document.querySelector("#dialog-image-credit");
@@ -986,7 +1002,9 @@
     document.querySelector("[data-continue]").onclick=()=>closeCartDialog();
     cartDialog.addEventListener("close",()=>{if(returnDish){const snapshot=returnDish;returnDish=null;if(dialog.open){setDetailTab(snapshot.tab);dialog.scrollTop=snapshot.scroll;}}});
     $("dock-favorites").onclick=()=>{activeMenuFilter="favoritos";renderMenuTabs();renderMenu(activeMenuFilter);$("menu").scrollIntoView();};
-    ["price-filter","price-sort"].forEach(id=>$(id).addEventListener(id==="price-filter"?"input":"change",()=>renderMenu(activeMenuFilter)));
+    let priceFilterTimer;
+    $("price-filter").addEventListener("input",()=>{clearTimeout(priceFilterTimer);priceFilterTimer=setTimeout(()=>renderMenu(activeMenuFilter),180);});
+    $("price-sort").addEventListener("change",()=>renderMenu(activeMenuFilter));
     $("text-size").onclick=()=>{const large=document.documentElement.classList.toggle("large-text");$("text-size").setAttribute("aria-pressed",String(large));try{localStorage.setItem("ec-large",String(large));}catch{}};
     try{if(localStorage.getItem("ec-large")==="true"){document.documentElement.classList.add("large-text");$("text-size").setAttribute("aria-pressed","true");}}catch{}
     $("help-open").onclick=()=>$("help-dialog").showModal();$("help-close").onclick=()=>{$("help-dialog").close();};

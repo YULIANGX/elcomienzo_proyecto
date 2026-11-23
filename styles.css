@@ -502,3 +502,8 @@
 @keyframes ec-mobile-open{from{opacity:0}to{opacity:1}}
 @keyframes ec-mobile-close{to{opacity:0}}
 @media(prefers-reduced-motion:reduce){#dish-dialog[open],#dish-dialog.is-closing[open]{animation:none!important}}
+
+/* AR accesible y visible en la vista de detalles (2.9.6) */
+#dish-dialog .scene-controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+#dish-dialog #launch-ar.model-ar-button { position:static; inset:auto; display:inline-flex; justify-content:center; align-items:center; min-height:46px; border-radius:10px; padding:12px 16px; font-size:.72rem; background:#c5a46d; color:#11110f; font-weight:700; letter-spacing:.045em; }
+#dish-dialog #launch-ar.model-ar-button:focus-visible { outline:3px solid #f1eee6; outline-offset:3px; }

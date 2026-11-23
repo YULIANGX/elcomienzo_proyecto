@@ -651,11 +651,49 @@
       modelStatus.hidden = false;
     });
     document.querySelector("[data-model-reset]").addEventListener("click", resetModelCamera);
+    // Botón AR independiente del slot interno: evita que quede oculto por cambios de diseño.
+    const launchAR = document.querySelector("#launch-ar");
+    let arModelReady = false;
+    dishModel.addEventListener("load", () => { arModelReady = true; });
+    dishModel.addEventListener("error", () => { arModelReady = false; });
+    launchAR.addEventListener("click", () => {
+      if (!window.isSecureContext) {
+        modelStatus.textContent = "La realidad aumentada requiere abrir el sitio mediante HTTPS (GitHub Pages).";
+        modelStatus.hidden = false;
+        return;
+      }
+      if (!arModelReady || !dishModel.getAttribute("src")) {
+        modelStatus.textContent = "El plato 3D todavía está cargando. Espera unos segundos e inténtalo de nuevo.";
+        modelStatus.hidden = false;
+        return;
+      }
+      if (typeof dishModel.activateAR !== "function") {
+        modelStatus.textContent = "El visor AR no está listo. Comprueba la conexión y actualiza la página.";
+        modelStatus.hidden = false;
+        return;
+      }
+      if (dishModel.canActivateAR === false) {
+        modelStatus.textContent = "Este navegador no ofrece AR para este dispositivo. Prueba Chrome en Android o Safari en iPhone.";
+        modelStatus.hidden = false;
+        return;
+      }
+      try {
+        const result = dishModel.activateAR();
+        if (result && typeof result.catch === "function") result.catch(() => {
+          modelStatus.textContent = "No se pudo iniciar AR. Prueba Chrome (Android) o Safari (iPhone) y comprueba que el modelo terminó de cargar.";
+          modelStatus.hidden = false;
+        });
+      } catch (_) {
+        modelStatus.textContent = "No se pudo abrir AR en este navegador. Prueba Chrome en Android o Safari en iPhone.";
+        modelStatus.hidden = false;
+      }
+    });
+
 
     function setDialogView(view) {
       const show3d = view === "3d";
-      if(show3d) loadActiveDishModel(true);
-      else { dishModel.removeAttribute("src"); dishModel.removeAttribute("ios-src"); }
+      if(show3d) { arModelReady = false; loadActiveDishModel(true); }
+      else { arModelReady = false; dishModel.removeAttribute("src"); dishModel.removeAttribute("ios-src"); }
       document.querySelector("#dialog-photo").hidden = show3d;
       document.querySelector("#dish-3d").hidden = !show3d;
       document.querySelectorAll("[data-dialog-view]").forEach((button) => {
